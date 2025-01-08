@@ -1,0 +1,7 @@
+django==5.1.4
+django-grappelli==4.0.1
+django-cleanup
+graphene-django
+django-cors-headers
+django-graphql-jwt
+pydantic-settings==2.7.1
