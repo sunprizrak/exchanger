@@ -19,9 +19,6 @@ export async function telegramAuth(initData) {
         const userStore = useUserStore();
         userStore.setToken(token);
         userStore.setUser(user);
-
-        console.log(userStore.getToken);
-        console.log(userStore.getUser);
     } catch (error) {
         console.error("Ошибка авторизации:", error);
     }

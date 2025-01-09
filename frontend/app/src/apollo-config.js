@@ -11,20 +11,20 @@ const httpLink = createHttpLink({
     uri: "http://127.0.0.1:8000/graphql", // Matches the url and port that Django is using
 });
 
-//const authLink = setContext((_, { headers }) => {
-//  // get the authentication token from local storage if it exists
-//  const token = localStorage.getItem("token");
-//  // return the headers to the context so httpLink can read them
-//  return {
-//    headers: {
-//      ...headers,
-//      authorization: token || "",
-//    },
-//  };
-//});
+const authLink = setContext((_, { headers }) => {
+    // get the authentication token from local storage if it exists
+    const token = localStorage.getItem("token");
+    // return the headers to the context so httpLink can read them
+    return {
+        headers: {
+            ...headers,
+            authorization: token || "",
+        },
+    };
+});
 
 export const apolloClient = new ApolloClient({
-    link: httpLink,
+    link: authLink.concat(httpLink),
     cache: new InMemoryCache(),
 });
 
