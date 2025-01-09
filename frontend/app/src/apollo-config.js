@@ -23,11 +23,11 @@ const httpLink = createHttpLink({
 //  };
 //});
 
-const apolloClient = new ApolloClient({
-  link: httpLink,
-  cache: new InMemoryCache(),
+export const apolloClient = new ApolloClient({
+    link: httpLink,
+    cache: new InMemoryCache(),
 });
 
 export const apolloProvider = createApolloProvider({
-  defaultClient: apolloClient,
+    defaultClient: apolloClient,
 });

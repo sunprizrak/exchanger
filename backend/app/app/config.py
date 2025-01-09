@@ -24,6 +24,10 @@ class DatabaseConfig(BaseModel):
     port: int
 
 
+class TelegramBot(BaseModel):
+    telegram_bot_token: str
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=(os.path.join(BASE_DIR, '.env.template'), os.path.join(BASE_DIR, '.env')),
@@ -34,6 +38,7 @@ class Settings(BaseSettings):
     )
     django: DjangoConfig
     db: DatabaseConfig
+    tg: TelegramBot
 
 
 settings = Settings()

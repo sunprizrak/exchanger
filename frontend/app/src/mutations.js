@@ -1,9 +1,10 @@
 import gql from "graphql-tag";
 
-export const USER_SIGNUP = gql`
-    mutation ($tgId: String!, $tgUsername: String!) {
-        createUser(tgId: $tgId, tgUsername: $tgUsername) {
-            // request from server
+
+export const TG_AUTH = gql`
+    mutation ($initData: String!) {
+        telegramAuth(initData: $initData) {
+            token
             user {
                 tgId
                 tgUsername

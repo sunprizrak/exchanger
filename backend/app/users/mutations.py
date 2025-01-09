@@ -1,22 +1,12 @@
 import graphene
+import graphql_jwt
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from .types import UserType
-import graphql_jwt
+from graphql_jwt.shortcuts import get_token
+from .utility import verify_telegram_data
 
 UserModel = get_user_model()
-
-
-class CreateUser(graphene.Mutation):
-    user = graphene.Field(UserType)
-
-    class Arguments:
-        tg_id = graphene.String(required=True)
-        tg_username = graphene.String(required=True)
-
-    def mutate(self, info, tg_id, tg_username):
-        print('hello mutate')
-        obj = UserModel.objects.create_user(tg_id=tg_id, tg_username=tg_username)
-        return CreateUser(user=obj)
 
 
 class ObtainJSONWebToken(graphql_jwt.JSONWebTokenMutation):
@@ -27,8 +17,42 @@ class ObtainJSONWebToken(graphql_jwt.JSONWebTokenMutation):
         return cls(user=info.context.user)
 
 
+class TelegramAuth(graphene.Mutation):
+    user = graphene.Field(UserType)
+    token = graphene.String()
+
+    class Arguments:
+        init_data = graphene.String(required=True)
+
+    def mutate(self, info, init_data):
+        token = settings.TELEGRAM_BOT_TOKEN
+
+        # Проверка валидности данных Telegram
+        user_data = verify_telegram_data(token=token, init_data=init_data)
+
+        if not user_data:
+            raise Exception("Недействительные данные Telegram.")
+
+        telegram_id, username = user_data
+
+        # Преобразование init_data в словарь
+        try:
+            init_data_dict = dict(item.split("=") for item in init_data.split("&"))
+        except ValueError:
+            raise Exception("Ошибка обработки init_data.")
+
+        user, created = UserModel.objects.get_or_create(
+            tg_id=telegram_id,
+            defaults={"tg_username": username},
+        )
+
+        # Выдача токена
+        token = get_token(user)
+        return TelegramAuth(user=user, token=token)
+
+
 class Mutation(graphene.ObjectType):
     token_auth = ObtainJSONWebToken.Field()
     verify_token = graphql_jwt.Verify.Field()
     refresh_token = graphql_jwt.Refresh.Field()
-    create_user = CreateUser.Field()
+    telegram_auth = TelegramAuth.Field()
