@@ -1,6 +1,7 @@
-import './assets/css/main.css';
 import { createApp } from 'vue';
 import App from './App.vue';
+import './index.css';
+import 'flowbite';
 import router from './router';
 import { apolloProvider } from "@/apollo-config";
 import { createPinia } from "pinia";
