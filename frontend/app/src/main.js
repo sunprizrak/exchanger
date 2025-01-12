@@ -9,7 +9,6 @@ import { telegramUtils, initializeTelegram } from '@/services/telegram';
 import { telegramAuth } from '@/services/auth';
 
 
-
 async function main() {
     try {
         // Создание Vue приложения

@@ -54,7 +54,7 @@
 body {
     width: 100%;
     min-height: 100vh;
-    display: flex;
+    /*display: flex;
     color: var(--color-text);
     background: var(--color-background);
     transition:
@@ -76,5 +76,5 @@ body {
         sans-serif;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    -moz-osx-font-smoothing: grayscale; */
 }

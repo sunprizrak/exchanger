@@ -138,6 +138,6 @@ GRAPHENE = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = ("http://127.0.0.1:5173", "https://c096-169-150-196-143.ngrok-free.app",)
+CORS_ORIGIN_WHITELIST = ("http://127.0.0.1:5173", "https://rnpka-37-214-64-61.a.free.pinggy.link",)
 
 TELEGRAM_BOT_TOKEN = settings.tg.telegram_bot_token

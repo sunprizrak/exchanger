@@ -1,15 +1,15 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+    import { RouterLink, RouterView } from 'vue-router';
+    import Navbar from './components/Navbar.vue';
+    import Jltlbackground from './components/Jltlbackground.vue';
 </script>
 
 <template>
     <header>
-        <div>
-
-        </div>
+        <Navbar />
     </header>
-
-    <RouterView />
+    <Jltlbackground />
+<!--    <RouterView />-->
 </template>
 
 <script>
