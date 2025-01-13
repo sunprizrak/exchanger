@@ -1,12 +1,9 @@
 <script setup>
-import Jltlbackground from '@/components/Jltlbackground.vue';
 import FormChange from '@/components/FormChange.vue';
 </script>
 
 <template>
     <main>
-        <Jltlbackground />
-
         <FormChange />
     </main>
 </template>
@@ -22,5 +19,6 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: #303032;
 }
 </style>

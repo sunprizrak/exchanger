@@ -46,7 +46,7 @@ export default {
             controls.enableDamping = true; // Включаем плавность
             controls.dampingFactor = 0.25; // Мощность плавности
             controls.screenSpacePanning = false; // Запрещаем панорамирование по экрану
-            controls.enableZoom = false
+            // controls.enableZoom = false;
 
             // Загружаем модель GLTF
             const loader = new GLTFLoader();
@@ -76,8 +76,8 @@ export default {
                         // Анимация модели (если нужна)
                         // Если у модели есть анимация, можно добавить сюда код для её воспроизведения.
 
-                        coin.rotation.y += 0.01;
-                        coin.rotation.x += 0.01;
+                        // coin.rotation.y += 0.01;
+                        // coin.rotation.x += 0.01;
 
                         renderer.render(scene, camera);
                     };
