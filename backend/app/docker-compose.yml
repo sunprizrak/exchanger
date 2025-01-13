@@ -1,0 +1,74 @@
+services:
+    backend:
+        build: .
+        command: python manage.py runserver 0.0.0.0:8000
+        volumes:
+            - .:/usr/src/app
+        ports:
+            - 8000:8000
+        depends_on:
+            - db
+    db:
+        image: postgres:16.2-alpine3.18
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+        environment:
+            POSTGRES_DB: exchanger
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+    redis:
+        image: redis:7.2.5-alpine
+        hostname: redis
+    celery:
+        build: .
+        hostname: celery
+        environment:
+            - CELERY_BROKER_URL=redis://redis:6379/0
+            - CELERY_RESULT_BACKEND=redis://redis:6379/0
+            - CELERY__ACCEPT_CONTENT=application/json
+            - CELERY__TASK_SERIALIZER=json
+            - CELERY__RESULT_SERIALIZER=json
+        command: celery -A web worker --loglevel=error
+        volumes:
+            - .:/usr/src/app
+        links:
+            - redis
+        depends_on:
+            - redis
+            - db
+    celery-beat:
+        build: .
+        command: celery -A web beat -l info
+        volumes:
+            - .:/usr/src/app
+        environment:
+            - CELERY_BROKER_URL=redis://redis:6379/0
+            - CELERY_RESULT_BACKEND=redis://redis:6379/0
+            - CELERY__ACCEPT_CONTENT=application/json
+            - CELERY__TASK_SERIALIZER=json
+            - CELERY__RESULT_SERIALIZER=json
+        depends_on:
+            - redis
+            - db
+    flower:
+        build: .
+        hostname: flower
+        command: celery -A web flower
+        volumes:
+            - .:/usr/src/app
+        environment:
+            - CELERY_BROKER_URL=redis://redis:6379/0
+            - CELERY_RESULT_BACKEND=redis://redis:6379/0
+            - CELERY__ACCEPT_CONTENT=application/json
+            - CELERY__TASK_SERIALIZER=json
+            - CELERY__RESULT_SERIALIZER=json
+        links:
+            - redis
+        depends_on:
+            - redis
+            - celery
+            - db
+        ports:
+            -   '5555:5555'
+volumes:
+    postgres_data:

@@ -55,13 +55,8 @@ export default {
                 '/bitcoin/scene.gltf', // путь к модели
                 (gltf) => {
                     const coin = gltf.scene; // Получаем объект сцены из загруженной модели
-
-                    // Создаём группу
-                    const coinGroup = new THREE.Group();
-                    scene.add(coinGroup);
-                    coinGroup.add(coin);
-
                     coin.scale.set(0.01, 0.01, 0.01); // Устанавливаем масштаб
+                    scene.add(coin);
 
                     // Центрируем модель
                     const box = new THREE.Box3().setFromObject(coin); // Получаем границы модели
@@ -70,12 +65,9 @@ export default {
 
                     const size = box.getSize(new THREE.Vector3()); // Размеры модели
 
-                    // Поднимаем группу вверх, не изменяя центр модели
-                    coinGroup.position.y += size.y / 1.5; // Поднимаем точку вращения не влияя на вращение модели
-
-
-
-
+                    // Устанавливаем цель OrbitControls на центр модели
+                    controls.target.copy(coin.position);
+                    controls.update();
 
                     // Анимация
                     const animate = function () {
@@ -83,6 +75,9 @@ export default {
 
                         // Анимация модели (если нужна)
                         // Если у модели есть анимация, можно добавить сюда код для её воспроизведения.
+
+                        coin.rotation.y += 0.01;
+                        coin.rotation.x += 0.01;
 
                         renderer.render(scene, camera);
                     };

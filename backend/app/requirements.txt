@@ -5,3 +5,10 @@ graphene-django
 django-cors-headers
 django-graphql-jwt
 pydantic-settings==2.7.1
+celery
+django-celery-beat
+redis
+requests
+gunicorn
+psycopg2-binary
+markdown

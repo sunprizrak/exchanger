@@ -1,5 +1,7 @@
 from pathlib import Path
 from .config import settings
+from celery.schedules import crontab
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,7 +30,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'orders',
+    'coins',
     'graphene_django',
+    'django_celery_beat',
     'corsheaders',
     'django_cleanup.apps.CleanupConfig',
 ]
@@ -70,14 +74,12 @@ WSGI_APPLICATION = 'app.wsgi.application'
 
 DATABASES = {
     'default': {
-        # "ENGINE": settings.db.engine,
-        # "NAME": settings.db.name,
-        # "USER": settings.db.user,
-        # "PASSWORD": settings.db.password,
-        # "HOST": settings.db.host,
-        # "PORT": settings.db.port,
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        "ENGINE": settings.db.engine,
+        "NAME": settings.db.name,
+        "USER": settings.db.user,
+        "PASSWORD": settings.db.password,
+        "HOST": settings.db.host,
+        "PORT": settings.db.port,
     }
 }
 
@@ -117,6 +119,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'static'
+
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -141,3 +147,13 @@ CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = ("http://127.0.0.1:5173", "https://rnpka-37-214-64-61.a.free.pinggy.link",)
 
 TELEGRAM_BOT_TOKEN = settings.tg.telegram_bot_token
+
+CELERY_BROKER_URL = settings.celery.broker_url
+CELERY_RESULT_BACKEND = settings.celery.result_backend
+CELERY_ACCEPT_CONTENT = settings.celery.accept_content
+CELERY_TASK_SERIALIZER = settings.celery.task_serializer
+CELERY_RESULT_SERIALIZER = settings.celery.result_serializer
+
+CELERY_BEAT_SCHEDULE = {
+
+}

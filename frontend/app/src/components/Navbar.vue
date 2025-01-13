@@ -1,10 +1,10 @@
 <script setup>
-import Tabs from './Tabs.vue';
+import ButtonGroup from './ButtonGroup.vue';
 </script>
 
 <template>
     <div class="navbar">
-<!--        <Tabs />-->
+        <ButtonGroup />
     </div>
 </template>
 
@@ -18,6 +18,8 @@ import Tabs from './Tabs.vue';
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: purple;
+    background-color: #303032;
 }
+
+
 </style>

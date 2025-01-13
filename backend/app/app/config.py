@@ -28,6 +28,13 @@ class TelegramBot(BaseModel):
     telegram_bot_token: str
 
 
+class CeleryConfig(BaseModel):
+    broker_url: str
+    result_backend: str
+    accept_content: str
+    task_serializer: str
+    result_serializer: str
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=(os.path.join(BASE_DIR, '.env.template'), os.path.join(BASE_DIR, '.env')),
@@ -39,6 +46,7 @@ class Settings(BaseSettings):
     django: DjangoConfig
     db: DatabaseConfig
     tg: TelegramBot
+    celery: CeleryConfig
 
 
 settings = Settings()
