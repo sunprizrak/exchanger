@@ -4,8 +4,28 @@ import logging
 logger = logging.getLogger()
 
 
-def get_xmr_price():
-    url = "https://api.huobi.pro/market/detail/merged?symbol=xmrusdt"
+def price_usdt_rub():
+    """Текущая цена USDT в RUB с добавочной стоимостью на покупку"""
+
+    url = "https://api.coingecko.com/api/v3/simple/price"
+    params = {
+        "ids": "tether",
+        "vs_currencies": "rub"
+    }
+
+    response = requests.get(url, params=params)
+
+    if response.status_code == 200:
+        data = response.json()
+        price = data['tether']['rub'] + 4
+        return price
+    else:
+        logger.debug(f"Request Error: {response.status_code}")
+
+
+def price_coin_usdt(symbol):
+    """Текущая цена Monero(XMR) в USD"""
+    url = f"https://api.huobi.pro/market/detail/merged?symbol={symbol}usdt"
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -19,23 +39,13 @@ def get_xmr_price():
         logger.debug("HTTP Request failed:", error)
 
 
-def get_usd_price():
-    url = 'https://open.er-api.com/v6/latest/USD'
+# Текущая цена Monero(XMR) в RUB
+def price_coin_rub(coin_usdt):
+    usdt_rub = price_usdt_rub()
+    coin_rub = round((coin_usdt * usdt_rub), 2)
+    return coin_rub
 
-    response = requests.get(url)
-
-    if response.status_code == 200:
-        data = response.json()
-        usd_to_rub = data['rates']['RUB']
-        return usd_to_rub + 4
-    else:
-        logger.debug(f"Ошибка запроса: {response.status_code}")
 
 
 if __name__ == '__main__':
-    # Получить цену
-    current_price = get_xmr_price()
-    print(f"Текущая цена Monero в USDT: {current_price}")
-
-    buy_current_pice_usd = get_usd_price()
-    print(f'Курс USD/RUB: {buy_current_pice_usd}')
+    pass

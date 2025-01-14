@@ -28,7 +28,7 @@ services:
             - CELERY__ACCEPT_CONTENT=application/json
             - CELERY__TASK_SERIALIZER=json
             - CELERY__RESULT_SERIALIZER=json
-        command: celery -A web worker --loglevel=error
+        command: celery -A app worker --loglevel=error
         volumes:
             - .:/usr/src/app
         links:
@@ -38,7 +38,7 @@ services:
             - db
     celery-beat:
         build: .
-        command: celery -A web beat -l info
+        command: celery -A app beat -l info
         volumes:
             - .:/usr/src/app
         environment:
@@ -53,7 +53,7 @@ services:
     flower:
         build: .
         hostname: flower
-        command: celery -A web flower
+        command: celery -A app flower
         volumes:
             - .:/usr/src/app
         environment:

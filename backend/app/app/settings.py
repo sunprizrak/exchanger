@@ -155,5 +155,8 @@ CELERY_TASK_SERIALIZER = settings.celery.task_serializer
 CELERY_RESULT_SERIALIZER = settings.celery.result_serializer
 
 CELERY_BEAT_SCHEDULE = {
-
+    'update-coins-price-every-10-minutes': {
+        'task': 'coins.tasks.update_coins_price',
+        'schedule': 300.0,  # 300 секунд = 5 минут
+    },
 }
