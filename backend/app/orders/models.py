@@ -13,7 +13,7 @@ class Order(models.Model):
     status = models.CharField(
         verbose_name='Статус',
         max_length=50,
-        choices=[('pending', 'Pending'), ('completed', 'Completed'), ('cancelled', 'Cancelled')],
+        choices=[('pending', 'Pending'), ('confirmed', 'Confirmed'), ('completed', 'Completed'), ('cancelled', 'Cancelled')],
         default='pending',
     )
     created = models.DateTimeField(verbose_name=_('created'), auto_now_add=True)

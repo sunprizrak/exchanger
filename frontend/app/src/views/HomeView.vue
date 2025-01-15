@@ -19,6 +19,7 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #303032;
+    background: inherit;
+    position: relative;
 }
 </style>

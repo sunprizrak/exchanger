@@ -31,7 +31,7 @@ class TelegramBot(BaseModel):
 class CeleryConfig(BaseModel):
     broker_url: str
     result_backend: str
-    accept_content: str
+    accept_content: List[str]
     task_serializer: str
     result_serializer: str
 

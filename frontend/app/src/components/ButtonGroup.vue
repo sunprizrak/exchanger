@@ -163,9 +163,8 @@ export default {
 
 .button-group > div {
     cursor: pointer;
-    flex: 1;
     width: 70px;
-    background-image: linear-gradient(to top, #242424 0%, #303030 100%);
+    background-color: var(--color-background);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -213,7 +212,7 @@ export default {
     height: 24px;
     position: relative;
     display: block;
-    fill: #181818;
+    fill: var(--color-text);
     filter: drop-shadow(0 1px 1px rgba(255,255,255,0.15)) url("#inset-shadow");
 }
 

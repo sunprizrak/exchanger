@@ -18,7 +18,7 @@ import ButtonGroup from './ButtonGroup.vue';
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #303032;
+    background-color: inherit;
 }
 
 

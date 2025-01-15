@@ -1,6 +1,5 @@
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from django.conf import settings
 from .models import Coin
 from .utility import (
     price_coin_usdt,

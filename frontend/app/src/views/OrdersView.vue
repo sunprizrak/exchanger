@@ -20,6 +20,6 @@
 
 <style>
 main {
-    background-color: #303032;
+    background-color: inherit;
 }
 </style>
