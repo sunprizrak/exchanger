@@ -2,3 +2,4 @@ __pycache__
 .venv
 app/.env
 app/db.sqlite3
+app/media
