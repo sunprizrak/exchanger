@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'users',
     'orders',
     'coins',
+    'payment_methods',
     'graphene_django',
     'django_celery_beat',
     'corsheaders',
@@ -123,6 +124,8 @@ STATIC_ROOT = BASE_DIR / 'static'
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+SITE_URL = settings.django.site_url
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

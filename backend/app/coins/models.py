@@ -13,7 +13,7 @@ def path_coin_icon(instance, filename):
 class Coin(models.Model):
     name = models.CharField(verbose_name='Название', max_length=255, unique=True)
     ticker = models.CharField(verbose_name='Тикер', max_length=255, unique=True)
-    icon = models.ImageField(verbose_name='Иконка', upload_to=path_coin_icon, default='coins/icons/default_image.png', blank=True)
+    icon = models.ImageField(verbose_name='Иконка', upload_to=path_coin_icon, default='default_image.png', blank=True)
     price_usd = models.DecimalField(verbose_name='Цена USD', max_digits=10, decimal_places=2, null=True, blank=True)
     price_rub = models.DecimalField(verbose_name='Цена RUB', max_digits=10, decimal_places=2, null=True, blank=True)
     price_byn = models.DecimalField(verbose_name='Цена BYN', max_digits=10, decimal_places=2, null=True, blank=True)

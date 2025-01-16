@@ -13,6 +13,7 @@ class DjangoConfig(BaseModel):
     allowed_hosts: List[str]
     language_code: str
     time_zone: str
+    site_url: str
 
 
 class DatabaseConfig(BaseModel):

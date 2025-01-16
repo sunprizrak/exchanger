@@ -7,3 +7,16 @@ export const USER_INFO = gql`
         }
     }
 `;
+
+export const GET_ALL_COINS = gql`
+    query {
+        allCoins {
+            name
+            ticker
+            fullIconUrl
+            priceUsd
+            priceRub
+            commissionRate
+        }
+    }
+`;

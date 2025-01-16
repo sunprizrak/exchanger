@@ -1,6 +1,3 @@
-<script setup>
-
-</script>
 
 <template>
     <div class="form-wrap">
@@ -23,9 +20,15 @@
                 <span>Вы получаете</span>
                 <div class="bottom-line">
                     <div class="coins">
-                        <img src="#"/>
-                        <select>
-                            <option>XMR</option>
+                        <img v-if="selectedCoin" :src="selectedCoin.fullIconUrl" alt="Coin Icon" />
+                        <select v-model="selectedTicker">
+                            <option
+                                v-for="coin in coins"
+                                :key="coin.ticker"
+                                :value="coin.ticker"
+                            >
+                                {{ coin.ticker }}
+                            </option>
                         </select>
                     </div>
                     <input type="number" placeholder="колличество"/>
@@ -39,8 +42,27 @@
 </template>
 
 
-<script>
+<script setup>
+import { useCoinsStore } from "@/stores/coin";
+import { computed, ref, watchEffect } from "vue";
 
+const coinsStore = useCoinsStore();
+const coins = computed(() => coinsStore.coins);
+
+// Локальное состояние для выбранного тикера
+const selectedTicker = ref(null);
+
+// Реакция на изменение списка монет
+watchEffect(() => {
+    if (coins.value.length > 0 && !selectedTicker.value) {
+        selectedTicker.value = coins.value[0].ticker; // Инициализируем тикер первой монеты
+    }
+});
+
+// Находим монету по тикеру
+const selectedCoin = computed(() => {
+    return coins.value.find((coin) => coin.ticker === selectedTicker.value);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -97,7 +119,8 @@
                         box-shadow: none;
                         font-weight: bold;
                         padding-right: 0;
-                        width: 65px;
+                        min-width: 65px;
+                        width: auto;
                     }
 
                 }
@@ -112,6 +135,7 @@
                     width: auto;
                     min-width: 150px;
                     padding: 0;
+                    caret-color: var(--color-text);
                 }
             }
         }

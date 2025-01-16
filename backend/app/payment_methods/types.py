@@ -1,14 +1,21 @@
 import graphene
 from django.conf import settings
 from graphene_django import DjangoObjectType
-from .models import Coin
+from .models import Currency, PaymentMethod
 
 
-class CoinType(DjangoObjectType):
-    full_icon_url = graphene.String()
+class PaymentMethodType(DjangoObjectType):
 
     class Meta:
-        model = Coin
+        model = PaymentMethod
+
+
+class CurrencyType(DjangoObjectType):
+    full_icon_url = graphene.String()
+    payment_methods = graphene.List(PaymentMethodType)
+
+    class Meta:
+        model = Currency
 
     def resolve_full_icon_url(self, info):
         """Этот метод будет возвращать полный URL для иконки."""
