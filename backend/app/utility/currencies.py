@@ -1,5 +1,6 @@
 import re
 from selenium import webdriver
+from selenium.webdriver import ActionChains
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
@@ -36,6 +37,9 @@ def fetch_exchange_rates():
     # Запуск Selenium WebDriver
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
+    # для действий(например навести мышь)
+    actions = ActionChains(driver)
+
     try:
         # Открываем сайт
         driver.get("https://www.tbank.ru/about/exchange/")
@@ -60,51 +64,22 @@ def fetch_exchange_rates():
         else:
             logger.warning("Третий элемент не найден.")
 
-        # Ожидание видимости выпадающего меню
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-qa-type='uikit/select']"))
-        )
-
-        # Клик по выпадающему меню, чтобы открыть его
-        dropdown = driver.find_element(By.CSS_SELECTOR, "div[data-qa-type='uikit/select']")
-        dropdown.click()
-
-        # Ожидание появления iframe
-        WebDriverWait(driver, 20).until(
-            EC.presence_of_element_located((By.ID, "twtIframePixel"))
-        )
-
-        # Переключение на iframe
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "twtIframePixel"))
-        )
-        iframe = driver.find_element(By.ID, "twtIframePixel")
-        driver.switch_to.frame(iframe)
+        select = WebDriverWait(driver=driver, timeout=10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div[data-qa-type='uikit/select']")))
+        driver.execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", select)  # Прокрутить к элементу
+        open_button = select.find_element(By.CSS_SELECTOR, "span[role='button']")
+        actions.move_to_element(open_button).perform()
+        open_button.click()
 
         # Ожидание видимости выпадающего меню внутри iframe
-        WebDriverWait(driver, 10).until(
+        dropdown = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-qa-type='uikit/popover.popoverBlock']"))
         )
-
-        # Клик по выпадающему меню
-        dropdown = driver.find_element(By.CSS_SELECTOR, "div[data-qa-type='uikit/popover.popoverBlock']")
-        dropdown.click()
-
-        # Ожидание появления выпадающего списка
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//div[text()='Белорусский рубль']"))
-        )
-
         # Находим элемент "Белорусский рубль"
-        element = driver.find_element(By.XPATH, "//div[text()='Белорусский рубль']")
-
-        # Скроллим до элемента через JavaScript
-        driver.execute_script("arguments[0].scrollIntoView();", element)
-
-        # Клик по элементу
+        element = dropdown.find_element(By.XPATH, ".//*[text()='Белорусский рубль']")
         element.click()
 
-        print("Выбран пункт: Белорусский рубль")
+        time.sleep(10)
+        # print("Выбран пункт: Белорусский рубль")
 
 
     # Извлечение курсов валют
