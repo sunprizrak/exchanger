@@ -20,3 +20,18 @@ export const GET_ALL_COINS = gql`
         }
     }
 `;
+
+export const GET_ALL_CURRENCIES = gql`
+    query {
+        allCurrencies {
+            id
+            name
+            code
+            fullIconUrl
+            paymentMethods {
+                id
+                name
+            }
+        }
+    },
+`;

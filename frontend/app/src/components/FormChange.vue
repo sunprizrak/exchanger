@@ -6,13 +6,27 @@
                 <span>Вы отправляете</span>
                 <div class="bottom-line">
                     <div class="country">
-                        <img src="#"/>
-                        <select>
-                            <option>RUB</option>
-                            <option>BYN</option>
-                        </select>
+                        <img v-if="selectedCurrency" :src="selectedCurrency.fullIconUrl" alt="Currency Icon" />
+                        <div>
+                            <select v-model="selectedCode">
+                                <option
+                                    v-for="currency in currencies"
+                                    :key="currency.code"
+                                    :value="currency.code"
+                                >
+                                    {{ currency.code }}
+                                </option>
+                            </select>
+                            <span v-if="selectedCurrency">{{ selectedCurrency.name }}</span>
+                        </div>
                     </div>
-                    <input type="number" placeholder="сумма"/>
+                    <input
+                        type="text"
+                        v-model="amount"
+                        @input="validateAmount"
+                        placeholder="Введите сумму"
+                        required
+                    />
                 </div>
             </div>
             <hr/>
@@ -21,15 +35,18 @@
                 <div class="bottom-line">
                     <div class="coins">
                         <img v-if="selectedCoin" :src="selectedCoin.fullIconUrl" alt="Coin Icon" />
-                        <select v-model="selectedTicker">
-                            <option
-                                v-for="coin in coins"
-                                :key="coin.ticker"
-                                :value="coin.ticker"
-                            >
-                                {{ coin.ticker }}
-                            </option>
-                        </select>
+                        <div>
+                            <select v-model="selectedTicker">
+                                <option
+                                    v-for="coin in coins"
+                                    :key="coin.ticker"
+                                    :value="coin.ticker"
+                                >
+                                    {{ coin.ticker }}
+                                </option>
+                            </select>
+                            <span v-if="selectedCoin">{{ selectedCoin.name }}</span>
+                        </div>
                     </div>
                     <input type="number" placeholder="колличество"/>
                 </div>
@@ -44,12 +61,31 @@
 
 <script setup>
 import { useCoinsStore } from "@/stores/coin";
+import { useCurrenciesStore } from "@/stores/currency";
 import { computed, ref, watchEffect } from "vue";
+
+const currenciesStore = useCurrenciesStore();
+const currencies = computed(() => currenciesStore.currencies);
+
+// Локальное состояние для выбранного кода валют
+const selectedCode = ref(null);
+
+// Реакция на изменение списка валют
+watchEffect(() => {
+    if (currencies.value.length > 0 && !selectedCode.value) {
+        selectedCode.value = currencies.value[0].code; // Инициализируем код первой валюты
+    }
+});
+
+// Находим валюту по коду
+const selectedCurrency = computed(() => {
+    return currencies.value.find((currency) => currency.code === selectedCode.value);
+});
 
 const coinsStore = useCoinsStore();
 const coins = computed(() => coinsStore.coins);
 
-// Локальное состояние для выбранного тикера
+// Локальное состояние для выбранного тикета
 const selectedTicker = ref(null);
 
 // Реакция на изменение списка монет
@@ -63,6 +99,28 @@ watchEffect(() => {
 const selectedCoin = computed(() => {
     return coins.value.find((coin) => coin.ticker === selectedTicker.value);
 });
+
+const amount = ref('');  // Локальное состояние для суммы
+
+// Функция для валидации ввода
+const validateAmount = (event) => {
+    let value = event.target.value;
+
+    // Оставляем только цифры и точку
+    value = value.replace(/[^\d.]/g, '');
+
+    // Ограничиваем количество знаков после точки до 2
+    const parts = value.split('.');
+    if (parts.length > 1) {
+        // Оставляем только первые два знака после точки
+        parts[1] = parts[1].slice(0, 2);
+        value = parts.join('.');
+    }
+
+    // Обновляем значение
+    amount.value = value;
+};
+
 </script>
 
 <style lang="scss" scoped>
@@ -88,6 +146,7 @@ const selectedCoin = computed(() => {
             width: 100%;
 
             span {
+                display: inline-block;
                 white-space: nowrap;
                 font-weight: bold;
                 font-size: 12px;
@@ -102,40 +161,46 @@ const selectedCoin = computed(() => {
                     display: flex;
                     flex-direction: row;
                     align-items: center;
-                    width: auto;
+                    width: fit-content;
 
                     img {
-                        height: 25px;
-                        width: 25px;
+                        height: 35px;
+                        width: 35px;
                         border-radius: 50%;
-                        flex-shrink: 0;
                     }
 
-                    select {
-                        background-color: transparent;
-                        background-position: right 0.2rem center;
-                        border: 0;
-                        outline: none;
-                        box-shadow: none;
-                        font-weight: bold;
-                        padding-right: 0;
-                        min-width: 65px;
-                        width: auto;
-                    }
+                    div {
+                        width: fit-content;
 
+
+                        select {
+                            background-color: transparent;
+                            border: 0;
+                            outline: none;
+                            box-shadow: none;
+                            font-weight: bold;
+                        }
+
+                        span {
+                            display: inline-block;
+                            white-space: nowrap;
+                            font-weight: bold;
+                            font-size: 12px;
+                            padding-left: 0.75rem;
+                        }
+                    }
                 }
 
                 input {
-                    flex-grow: 1;
                     background-color: transparent;
+                    box-sizing: border-box;
                     border: 0;
                     outline: none;
                     box-shadow: none;
                     text-align: right;
-                    width: auto;
-                    min-width: 150px;
                     padding: 0;
                     caret-color: var(--color-text);
+                    width: 100%;
                 }
             }
         }

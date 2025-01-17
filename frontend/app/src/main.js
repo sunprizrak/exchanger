@@ -8,6 +8,7 @@ import { createPinia } from "pinia";
 import { telegramUtils, initializeTelegram } from '@/services/telegram';
 import { telegramAuth } from '@/services/auth';
 import { useCoinsStore } from "@/stores/coin";
+import { useCurrenciesStore } from "@/stores/currency";
 
 
 async function main() {
@@ -17,6 +18,9 @@ async function main() {
 
         const coinsStore = useCoinsStore();
         await coinsStore.loadCoins(); // Загружаем монеты
+
+        const currenciesStore = useCurrenciesStore();
+        await currenciesStore.loadCurrencies(); // Загружаем валюты
 
         // Проверка на запуск внутри Telegram WebApp
         if (telegramUtils.isTelegramWebApp) {

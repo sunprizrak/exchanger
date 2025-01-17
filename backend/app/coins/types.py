@@ -1,6 +1,7 @@
 import graphene
 from django.conf import settings
 from graphene_django import DjangoObjectType
+
 from .models import Coin
 
 

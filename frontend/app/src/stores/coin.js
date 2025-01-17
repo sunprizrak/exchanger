@@ -17,7 +17,6 @@ export const useCoinsStore = defineStore({
                     });
                     // Сохраняет полученные данные в state
                     this.coins = data.allCoins;
-                    console.log(this.coins);
                 } catch (error) {
                     console.error("Error loading coins:", error);
                 }

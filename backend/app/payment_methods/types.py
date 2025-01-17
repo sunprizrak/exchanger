@@ -22,3 +22,7 @@ class CurrencyType(DjangoObjectType):
         if self.icon:
             return f"{settings.SITE_URL}{self.icon.url}"
         return None
+
+    def resolve_payment_methods(self, info):
+        """Возвращаем итерабельный список способов оплаты."""
+        return self.payment_methods.all()
