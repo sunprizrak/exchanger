@@ -3,3 +3,4 @@ __pycache__
 app/.env
 app/db.sqlite3
 app/media
+app/.wdm

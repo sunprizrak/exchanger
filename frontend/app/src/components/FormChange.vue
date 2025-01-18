@@ -20,13 +20,22 @@
                             <span v-if="selectedCurrency">{{ selectedCurrency.name }}</span>
                         </div>
                     </div>
-                    <input
-                        type="text"
-                        v-model="amount"
-                        @input="validateAmount"
-                        placeholder="Введите сумму"
-                        required
-                    />
+                    <div class="box-input">
+                        <input
+                            type="text"
+                            v-model="amount"
+                            @input="validateAmount"
+                            :min="minAmount"
+                            :max="maxAmount"
+                            placeholder="Введите сумму"
+                            required
+                        />
+                        <p class="error" v-if="!isValid">
+                            <span v-if="amount < minAmount">min: {{ selectedCurrency.symbol }}{{ minAmount }}</span>
+                            <span v-else-if="amount > maxAmount">max: {{ selectedCurrency.symbol }}{{ maxAmount }}</span>
+                        </p>
+
+                    </div>
                 </div>
             </div>
             <hr/>
@@ -48,7 +57,11 @@
                             <span v-if="selectedCoin">{{ selectedCoin.name }}</span>
                         </div>
                     </div>
-                    <input type="number" placeholder="колличество"/>
+                    <div class="box-input">
+                        <input
+                            type="number"
+                            placeholder="колличество"/>
+                    </div>
                 </div>
             </div>
         </form>
@@ -95,12 +108,10 @@ watchEffect(() => {
     }
 });
 
-// Находим монету по тикеру
-const selectedCoin = computed(() => {
-    return coins.value.find((coin) => coin.ticker === selectedTicker.value);
-});
-
+const minAmount = 10;  // Минимальное значение
+const maxAmount = 1000;  // Максимальное значение
 const amount = ref('');  // Локальное состояние для суммы
+const isValid = ref(true);  // Состояние для валидации
 
 // Функция для валидации ввода
 const validateAmount = (event) => {
@@ -119,6 +130,13 @@ const validateAmount = (event) => {
 
     // Обновляем значение
     amount.value = value;
+
+    // Проверка на минимальное и максимальное значение
+    if (parseFloat(amount.value) < minAmount || parseFloat(amount.value) > maxAmount) {
+        isValid.value = false;
+    } else {
+        isValid.value = true;
+    }
 };
 
 </script>
@@ -191,16 +209,28 @@ const validateAmount = (event) => {
                     }
                 }
 
-                input {
-                    background-color: transparent;
-                    box-sizing: border-box;
-                    border: 0;
-                    outline: none;
-                    box-shadow: none;
-                    text-align: right;
-                    padding: 0;
-                    caret-color: var(--color-text);
-                    width: 100%;
+                .box-input {
+                    position: relative;
+                    height: auto;
+
+                    input {
+                        background-color: transparent;
+                        box-sizing: border-box;
+                        border: 0;
+                        outline: none;
+                        box-shadow: none;
+                        text-align: right;
+                        padding: 0;
+                        caret-color: var(--color-text);
+                        width: 100%;
+                        height: 100%;
+                    }
+
+                    p {
+                        position: absolute;
+                        right: 0;
+                        bottom: 0;
+                    }
                 }
             }
         }

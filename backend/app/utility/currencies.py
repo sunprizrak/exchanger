@@ -1,4 +1,7 @@
+import os
 import re
+from decimal import Decimal
+
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.chrome.service import Service
@@ -15,9 +18,10 @@ logger = logging.getLogger()
 
 
 def fetch_exchange_rates():
+    """ получение курсов Т-банка usd/rub покупка, byn -> rub обмен"""
     # Настройки для работы в фоновом режиме
     chrome_options = Options()
-    # chrome_options.add_argument("--headless")  # Фоновый режим (без интерфейса браузера)
+    chrome_options.add_argument("--headless")  # Фоновый режим (без интерфейса браузера)
     chrome_options.add_argument("--disable-gpu")  # Отключение GPU для совместимости
     chrome_options.add_argument("--no-sandbox")  # Полезно для работы в контейнере
     chrome_options.add_argument("--disable-dev-shm-usage")  # Устранение ограничения памяти
@@ -59,10 +63,9 @@ def fetch_exchange_rates():
 
         # Получаем курс usd/rub (текст 3-го элемента (индексация с 0))
         if len(children) >= 3:
-            usd_rub_text = children[2].get_text(strip=True)
-            print(usd_rub_text)
+            usd_rub = children[2].get_text(strip=True)
         else:
-            logger.warning("Третий элемент не найден.")
+            logger.warning("Третий элемент usd/rub не найден.")
 
         select = WebDriverWait(driver=driver, timeout=10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div[data-qa-type='uikit/select']")))
         driver.execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", select)  # Прокрутить к элементу
@@ -70,7 +73,7 @@ def fetch_exchange_rates():
         actions.move_to_element(open_button).perform()
         open_button.click()
 
-        # Ожидание видимости выпадающего меню внутри iframe
+        # Ожидание видимости выпадающего меню
         dropdown = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-qa-type='uikit/popover.popoverBlock']"))
         )
@@ -78,23 +81,29 @@ def fetch_exchange_rates():
         element = dropdown.find_element(By.XPATH, ".//*[text()='Белорусский рубль']")
         element.click()
 
-        time.sleep(10)
-        # print("Выбран пункт: Белорусский рубль")
+        time.sleep(5)
 
+        # Получаем HTML-код
+        html = driver.page_source
 
-    # Извлечение курсов валют
-        # rows = soup.select("table tbody tr")  # Укажите правильный селектор таблицы
-        #
-        # exchange_rates = {}
-        # for row in rows:
-        #     cols = row.find_all("td")
-        #     if len(cols) >= 3:
-        #         currency_name = cols[0].get_text(strip=True)
-        #         buy_rate = cols[1].get_text(strip=True)
-        #         sell_rate = cols[2].get_text(strip=True)
-        #         exchange_rates[currency_name] = {"buy": buy_rate, "sell": sell_rate}
-        #
-        # return exchange_rates
+        # Парсинг через BeautifulSoup
+        soup = BeautifulSoup(html, "html.parser")
+
+        # Находим нужный div по классу
+        div = soup.find("div", class_="bSjF5d", string="Для всех")
+
+        parent_div = div.parent.parent
+
+        children = parent_div.find_all()
+
+        # Получаем курс usd/rub (текст 3-го элемента (индексация с 0))
+        if len(children) >= 6:
+            byn_rub = children[3].get_text(strip=True)
+        else:
+            logger.warning("Третий элемент usd/rub не найден.")
+
+        if usd_rub and byn_rub:
+            return Decimal(usd_rub), Decimal(byn_rub)
 
     finally:
         # Закрываем браузер

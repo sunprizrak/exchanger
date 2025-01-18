@@ -27,6 +27,7 @@ export const GET_ALL_CURRENCIES = gql`
             id
             name
             code
+            symbol
             fullIconUrl
             paymentMethods {
                 id

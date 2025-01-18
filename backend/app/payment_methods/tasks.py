@@ -1,0 +1,30 @@
+from decimal import Decimal
+from utility.currencies import fetch_exchange_rates
+from celery import shared_task
+from celery.utils.log import get_task_logger
+from .models import Currency
+
+
+logger = get_task_logger(__name__)
+
+
+@shared_task
+def update_currencies_price():
+    currencies = Currency.objects.all()
+
+    if currencies.exists():
+        usd_rub, byn_rub = fetch_exchange_rates()
+
+        for currency in currencies:
+            if currency.code == 'RUB':
+                if isinstance(usd_rub, Decimal):
+                    currency.update_exchange_rate(new_price_usd=usd_rub)
+                else:
+                    logger.warning('Курс USD_RUB не получен')
+            elif currency.code == 'BYN':
+                if isinstance(byn_rub, Decimal):
+                    currency.update_exchange_rate(new_price_usd=byn_rub)
+                else:
+                    logger.warning('Курс BYN_RUB не получен')
+    else:
+        logger.warning("<<<Курсы валют не получены>>>")

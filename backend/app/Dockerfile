@@ -7,7 +7,20 @@ WORKDIR /usr/src/app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-RUN apk update && apk add postgresql-dev postgresql-client gcc python3-dev musl-dev
+RUN apk update && \
+    apk add --no-cache \
+    postgresql-dev \
+    postgresql-client \
+    gcc \
+    python3-dev \
+    musl-dev \
+    curl \
+    libx11 \
+    libxcomposite \
+    libxrandr \
+    libxtst \
+    chromium \
+    ca-certificates
 
 # install dependencies
 RUN pip install --upgrade pip
@@ -19,5 +32,14 @@ COPY ./entrypoint.sh /usr/src/app
 
 # copy project
 COPY . .
+
+
+# Set permissions for chromedriver directory
+RUN mkdir -p /usr/src/app/.wdm/drivers
+RUN chmod -R 755 /usr/src/app/.wdm/drivers
+
+ENV WDM_LOCAL=True
+ENV WDM_DIR=/app/.wdm/drivers
+
 
 ENTRYPOINT ["sh", "/usr/src/app/entrypoint.sh"]
