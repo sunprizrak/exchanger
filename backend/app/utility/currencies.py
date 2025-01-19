@@ -21,6 +21,7 @@ def fetch_exchange_rates():
     """ получение курсов Т-банка usd/rub покупка, byn -> rub обмен"""
     # Настройки для работы в фоновом режиме
     chrome_options = Options()
+    chrome_options.binary_location = "/usr/bin/chromium-browser"
     chrome_options.add_argument("--headless")  # Фоновый режим (без интерфейса браузера)
     chrome_options.add_argument("--disable-gpu")  # Отключение GPU для совместимости
     chrome_options.add_argument("--no-sandbox")  # Полезно для работы в контейнере
@@ -36,7 +37,7 @@ def fetch_exchange_rates():
     chrome_options.add_argument(f"user-agent={user_agent}")
 
     # Автоматическая установка ChromeDriver
-    service = Service(ChromeDriverManager().install())
+    service = Service(executable_path="/usr/bin/chromedriver")
 
     # Запуск Selenium WebDriver
     driver = webdriver.Chrome(service=service, options=chrome_options)
@@ -63,7 +64,7 @@ def fetch_exchange_rates():
 
         # Получаем курс usd/rub (текст 3-го элемента (индексация с 0))
         if len(children) >= 3:
-            usd_rub = children[2].get_text(strip=True)
+            usd_rub = children[2].get_text(strip=True).replace(',', '.')
         else:
             logger.warning("Третий элемент usd/rub не найден.")
 
@@ -98,12 +99,15 @@ def fetch_exchange_rates():
 
         # Получаем курс usd/rub (текст 3-го элемента (индексация с 0))
         if len(children) >= 6:
-            byn_rub = children[3].get_text(strip=True)
+            byn_rub = children[3].get_text(strip=True).replace(',', '.')
         else:
             logger.warning("Третий элемент usd/rub не найден.")
 
+        usd_rub = Decimal(usd_rub).quantize(Decimal('0.01'))
+        byn_rub = Decimal(byn_rub).quantize(Decimal('0.01'))
+
         if usd_rub and byn_rub:
-            return Decimal(usd_rub), Decimal(byn_rub)
+            return usd_rub, byn_rub
 
     finally:
         # Закрываем браузер
@@ -112,6 +116,4 @@ def fetch_exchange_rates():
 
 # Пример вызова функции
 if __name__ == "__main__":
-    # rates = fetch_exchange_rates()
-    # print(rates)
-    fetch_exchange_rates()
+    print(fetch_exchange_rates())

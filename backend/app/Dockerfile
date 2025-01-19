@@ -1,4 +1,8 @@
-FROM python:3.12.3-alpine3.18
+###########
+# BUILDER #
+###########
+
+FROM python:3.12.3-alpine3.18 as builder
 
 # set work directory
 WORKDIR /usr/src/app
@@ -7,39 +11,67 @@ WORKDIR /usr/src/app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-RUN apk update && \
-    apk add --no-cache \
-    postgresql-dev \
-    postgresql-client \
-    gcc \
-    python3-dev \
+# install dependecies
+RUN apk update && apk add --no-cache \
     musl-dev \
+    python3-dev \
+    postgresql-dev \
     curl \
-    libx11 \
-    libxcomposite \
-    libxrandr \
-    libxtst \
+    bash \
+    g++ \
+    gcc \
+    make \
+    libffi-dev \
+    musl-dev \
+    linux-headers \
     chromium \
-    ca-certificates
+    chromium-chromedriver
 
 # install dependencies
 RUN pip install --upgrade pip
 COPY ./requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
 
-# copy entrypoint.sh
-COPY ./entrypoint.sh /usr/src/app
+#########
+# FINAL #
+#########
+
+# pull official base image
+FROM python:3.12.3-alpine3.18
+
+# create directory for the app
+RUN mkdir -p /home/appuser/backend
+
+# create the app user
+RUN addgroup -g 1000 appgroup && adduser -u 1000 -G appgroup -S appuser
+
+# create the appropriate directories
+ENV HOME=/home/appuser
+ENV APP_HOME=/home/appuser/backend/app
+
+# Create directories for static files and media files and work directory
+RUN mkdir -p $APP_HOME/static
+WORKDIR $APP_HOME
+
+# Install required libraries (libpq for PostgreSQL)
+RUN apk update && apk add libpq
+
+# Copy wheels and install dependencies
+COPY --from=builder /usr/src/app/wheels /wheels
+COPY --from=builder /usr/src/app/requirements.txt .
+RUN pip install --no-cache /wheels/*
 
 # copy project
-COPY . .
+COPY . $APP_HOME
 
+# copy entrypoint.sh
+RUN sed -i 's/\r$//g' $APP_HOME/entrypoint.sh
+RUN chmod +x $APP_HOME/entrypoint.sh
 
-# Set permissions for chromedriver directory
-RUN mkdir -p /usr/src/app/.wdm/drivers
-RUN chmod -R 755 /usr/src/app/.wdm/drivers
+# chown all the files to the app user
+RUN chown -R appuser:appgroup $HOME
 
-ENV WDM_LOCAL=True
-ENV WDM_DIR=/app/.wdm/drivers
+# change to the app user
+USER appuser
 
-
-ENTRYPOINT ["sh", "/usr/src/app/entrypoint.sh"]
+ENTRYPOINT ["sh", "/home/appuser/backend/app/entrypoint.sh"]

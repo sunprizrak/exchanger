@@ -3,7 +3,7 @@ services:
         build: .
         command: python manage.py runserver 0.0.0.0:8000
         volumes:
-            - .:/usr/src/app
+            - .:/home/appuser/backend/app
         ports:
             - 8000:8000
         depends_on:
@@ -30,7 +30,7 @@ services:
             - CELERY__RESULT_SERIALIZER=json
         command: celery -A app worker --loglevel=error
         volumes:
-            - .:/usr/src/app
+            - .:/home/appuser/backend/app
         links:
             - redis
         depends_on:
@@ -38,9 +38,9 @@ services:
             - db
     celery-beat:
         build: .
-        command: celery -A app beat -l info
+        command: celery -A app beat --loglevel=info
         volumes:
-            - .:/usr/src/app
+            - .:/home/appuser/backend/app
         environment:
             - CELERY_BROKER_URL=redis://redis:6379/0
             - CELERY_RESULT_BACKEND=redis://redis:6379/0
@@ -55,7 +55,7 @@ services:
         hostname: flower
         command: celery -A app flower
         volumes:
-            - .:/usr/src/app
+            - .:/home/appuser/backend/app
         environment:
             - CELERY_BROKER_URL=redis://redis:6379/0
             - CELERY_RESULT_BACKEND=redis://redis:6379/0

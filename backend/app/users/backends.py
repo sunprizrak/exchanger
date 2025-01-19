@@ -12,18 +12,17 @@ class CustomAuthBackend(ModelBackend):
             if username is None:
                 username = tg_id
         if username is None or password is None:
-            return
+            return None
 
         # Попробуем найти пользователя по tg_id или email
-        try:
-            user = UserModel._default_manager.filter(
-                Q(tg_id=username) | Q(email=username)
-            ).first()
-        except UserModel.DoesNotExist:
-            UserModel().set_password(password)
-            return
+        user = UserModel._default_manager.filter(
+            Q(tg_id=username) | Q(email=username)
+        ).first()
+
+        if user is None:
+            return None
 
         if user.check_password(password) and self.user_can_authenticate(user):
             return user
 
-        return
+        return None
