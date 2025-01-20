@@ -3,15 +3,21 @@ from .models import Coin
 from .types import CoinType
 from graphql import GraphQLError
 
+from .utility import calculate_coin_amount
+
 
 class Query(graphene.ObjectType):
     # Получение монеты по тикеру
     coin = graphene.Field(CoinType, ticker=graphene.String(required=True))
     # Поле для запроса количества монет
-    get_coin_amount = graphene.Float(amount=graphene.Float(), currency_code=graphene.String(), coin_ticker=graphene.String())
+    coins_amount = graphene.Field(
+        graphene.Float,
+        amount=graphene.Float(required=True),
+        currency_code=graphene.String(required=True),
+        coin_ticker=graphene.String(required=True),
+    )
 
-
-    def resolve_order(root, info, ticker):
+    def resolve_coin(root, info, ticker):
         try:
             return Coin.objects.get(ticker=ticker)
         except Coin.DoesNotExist:
@@ -23,13 +29,9 @@ class Query(graphene.ObjectType):
     def resolve_all_coins(root, info):
         return Coin.objects.all()
 
-    def resolve_get_coin_amount(self, info, amount, currency_code, coin_ticker):
+    def resolve_coins_amount(self, info, amount, currency_code, coin_ticker):
         try:
-            # Находим монету по тикеру
-            coin = Coin.objects.get(ticker=coin_ticker)
             # Рассчитываем количество монет
-            return coin.calculate_coin_amount(amount, currency_code)
-        except Coin.DoesNotExist:
-            raise GraphQLError(f"Монета с тикером {coin_ticker} не найдена.")
+            return calculate_coin_amount(amount, currency_code, coin_ticker)
         except Exception as e:
-            raise GraphQLError(f"Ошибка при расчёте: {str(e)}")
+            raise GraphQLError(f"Ошибка: {str(e)}")

@@ -17,24 +17,47 @@ class Currency(models.Model):
     symbol = models.CharField(max_length=10, blank=True, verbose_name="Символ валюты")  # $, €, etc.
     price_usd = models.DecimalField(
         verbose_name="Цена в USD",
-        max_digits=10,
+        max_digits=50,
         decimal_places=2,
         null=True,
         blank=True,
     )
-    # Новые поля для минимальной и максимальной суммы
-    min_amount = models.DecimalField(
-        verbose_name="Мин. сумма в эквиваленте USD",
-        max_digits=10,
+    price_rub = models.DecimalField(
+        verbose_name="Цена в RUB",
+        max_digits=50,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+
+    min_amount_usd = models.DecimalField(
+        verbose_name="Мин. сумма в USD",
+        max_digits=50,
         decimal_places=2,
         default=10,
         blank=True,
     )
-    max_amount = models.DecimalField(
-        verbose_name="Макс. сумма в эквиваленте USD",
-        max_digits=10,
+    max_amount_usd = models.DecimalField(
+        verbose_name="Макс. сумма в USD",
+        max_digits=50,
         decimal_places=2,
         default=10000,
+        blank=True,
+    )
+
+    # Новые поля для минимальной и максимальной суммы
+    min_amount = models.DecimalField(
+        verbose_name="Мин. сумма",
+        max_digits=50,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    max_amount = models.DecimalField(
+        verbose_name="Макс. сумма",
+        max_digits=50,
+        decimal_places=2,
+        null=True,
         blank=True,
     )
 
@@ -42,22 +65,21 @@ class Currency(models.Model):
         verbose_name = "Валюта"
         verbose_name_plural = "Валюты"
 
-    def calculate_min_max(self):
+    def update_exchange_rate(self, new_price_usd, new_price_rub=None):
         """
-        Метод для расчета минимальной и максимальной суммы для валюты, основываясь на курсе USD.
-        """
-        if self.price_usd is not None and self.price_usd > 0:
-            # Минимальная и максимальная сумма в локальной валюте
-            self.min_amount = Decimal(self.min_amount) * self.price_usd
-            self.max_amount = Decimal(self.min_amount) * self.price_usd
-            self.save()
-
-    def update_exchange_rate(self, new_price_usd):
-        """
-        Обновляет курс USD для валюты и пересчитывает минимальные и максимальные суммы в эквиваленте USD.
+        Обновляет курс USD для валюты и пересчитывает минимальные и максимальные суммы.
         """
         self.price_usd = new_price_usd
-        self.calculate_min_max()
+
+        if new_price_rub:
+            self.price_rub = new_price_rub
+
+        if self.price_usd is not None and self.price_usd > 0:
+            # Минимальная и максимальная сумма в локальной валюте
+            self.min_amount = Decimal(self.min_amount_usd) * self.price_usd
+            self.max_amount = Decimal(self.max_amount_usd) * self.price_usd
+
+        self.save()
 
     def __str__(self):
         return f"{self.name} ({self.code})"

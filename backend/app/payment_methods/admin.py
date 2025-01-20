@@ -4,7 +4,17 @@ from .models import Currency, PaymentMethod
 
 @admin.register(Currency)
 class CurrencyAdmin(admin.ModelAdmin):
-    list_display = ("name", "code", "symbol", "get_payment_methods")
+    list_display = ("name",
+                    "code",
+                    "symbol",
+                    "price_usd",
+                    "price_rub",
+                    "min_amount_usd",
+                    "max_amount_usd",
+                    "min_amount",
+                    "max_amount",
+                    "get_payment_methods"
+                    )
     search_fields = ("name", "code")
 
     def get_payment_methods(self, obj):

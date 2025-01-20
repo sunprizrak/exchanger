@@ -12,20 +12,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # install dependecies
-RUN apk update && apk add --no-cache \
-    musl-dev \
-    python3-dev \
-    postgresql-dev \
-    curl \
-    bash \
-    g++ \
-    gcc \
-    make \
-    libffi-dev \
-    musl-dev \
-    linux-headers \
-    chromium \
-    chromium-chromedriver
+RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev
 
 # install dependencies
 RUN pip install --upgrade pip

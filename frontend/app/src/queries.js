@@ -16,7 +16,6 @@ export const GET_ALL_COINS = gql`
             fullIconUrl
             priceUsd
             priceRub
-            commissionRate
         }
     }
 `;
@@ -29,10 +28,19 @@ export const GET_ALL_CURRENCIES = gql`
             code
             symbol
             fullIconUrl
+            minAmount
+            maxAmount
             paymentMethods {
                 id
                 name
             }
         }
+    },
+`;
+
+
+export const GET_COINS_FOR_AMOUNT = gql`
+    query ($amount: Float!, $currencyCode: String!, $coinTicker: String!) {
+        coinsAmount(amount: $amount, currencyCode: $currencyCode, coinTicker: $coinTicker)
     },
 `;

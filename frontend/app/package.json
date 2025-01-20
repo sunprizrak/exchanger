@@ -15,6 +15,7 @@
     "flowbite": "^2.5.2",
     "graphql": "^16.10.0",
     "graphql-tag": "^2.12.6",
+    "lodash.debounce": "^4.0.8",
     "pinia": "^2.3.0",
     "sass": "^1.83.4",
     "three": "^0.172.0",

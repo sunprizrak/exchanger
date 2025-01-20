@@ -13,7 +13,7 @@ logger = get_task_logger(__name__)
 
 
 @shared_task
-def update_coins_price():
+def update_coins_price(*args):
     coins = Coin.objects.all()
 
     if coins.exists():
@@ -38,4 +38,4 @@ def update_coins_price():
 
 @shared_task
 def update_currencies_and_coins_price():
-    chain(update_currencies_price(), update_coins_price())().delay()
+    chain(update_currencies_price.s(), update_coins_price.s())()

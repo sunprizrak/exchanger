@@ -22,9 +22,13 @@ def update_currencies_price():
                 else:
                     logger.warning('Курс USD_RUB не получен')
             elif currency.code == 'BYN':
-                if isinstance(byn_rub, Decimal):
-                    currency.update_exchange_rate(new_price_usd=byn_rub)
+                if isinstance(byn_rub, Decimal) and isinstance(usd_rub, Decimal):
+                    usd_byn = usd_rub / byn_rub
+                    currency.update_exchange_rate(new_price_usd=usd_byn, new_price_rub=byn_rub)
                 else:
                     logger.warning('Курс BYN_RUB не получен')
+
+        return True
     else:
         logger.warning("<<<Курсы валют не получены>>>")
+        return "Не удалось обновить курсы валют: данные отсутствуют"

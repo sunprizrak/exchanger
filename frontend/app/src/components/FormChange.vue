@@ -31,10 +31,9 @@
                             required
                         />
                         <p class="error" v-if="!isValid">
-                            <span v-if="amount < minAmount">min: {{ selectedCurrency.symbol }}{{ minAmount }}</span>
-                            <span v-else-if="amount > maxAmount">max: {{ selectedCurrency.symbol }}{{ maxAmount }}</span>
+                            <span v-if="amount < minAmount">min: {{ selectedCurrency.symbol }}{{ minAmount.toFixed(2) }}</span>
+                            <span v-else-if="amount > maxAmount">max: {{ selectedCurrency.symbol }}{{ maxAmount.toFixed(2) }}</span>
                         </p>
-
                     </div>
                 </div>
             </div>
@@ -60,7 +59,9 @@
                     <div class="box-input">
                         <input
                             type="number"
-                            placeholder="колличество"/>
+                            placeholder="колличество"
+                            :value="coinsAmount"
+                        />
                     </div>
                 </div>
             </div>
@@ -75,7 +76,11 @@
 <script setup>
 import { useCoinsStore } from "@/stores/coin";
 import { useCurrenciesStore } from "@/stores/currency";
-import { computed, ref, watchEffect } from "vue";
+import { computed, ref, watchEffect, watch } from "vue";
+import debounce from 'lodash.debounce';
+import { apolloClient } from "@/apollo-config";
+import { GET_COINS_FOR_AMOUNT } from "@/queries";
+
 
 const currenciesStore = useCurrenciesStore();
 const currencies = computed(() => currenciesStore.currencies);
@@ -108,13 +113,28 @@ watchEffect(() => {
     }
 });
 
-const minAmount = 10;  // Минимальное значение
-const maxAmount = 1000;  // Максимальное значение
+// Находим монету по тикету
+const selectedCoin = computed(() => {
+    return coins.value.find((coin) => coin.ticker === selectedTicker.value);
+});
+
+
+// Вычисляем минимальную и максимальную сумму на основе выбранной валюты
+const minAmount = computed(() => {
+    const value = selectedCurrency.value?.minAmount || 0;
+    return parseFloat(value); // Преобразуем в число
+});
+
+const maxAmount = computed(() => {
+    const value = selectedCurrency.value?.maxAmount || Infinity;
+    return parseFloat(value); // Преобразуем в число
+});
+
 const amount = ref('');  // Локальное состояние для суммы
 const isValid = ref(true);  // Состояние для валидации
 
 // Функция для валидации ввода
-const validateAmount = (event) => {
+const validateAmount = debounce(async (event) => {
     let value = event.target.value;
 
     // Оставляем только цифры и точку
@@ -132,12 +152,45 @@ const validateAmount = (event) => {
     amount.value = value;
 
     // Проверка на минимальное и максимальное значение
-    if (parseFloat(amount.value) < minAmount || parseFloat(amount.value) > maxAmount) {
-        isValid.value = false;
+    const numericValue = parseFloat(amount.value || 0); // Преобразуем строку в число
+
+    // Проверка на пустое поле и отправка запроса
+    if (amount.value === '') {
+        isValid.value = true; // Если поле пустое, ошибка не показывается
+    } else if (numericValue < minAmount.value || numericValue > maxAmount.value) {
+        isValid.value = false; // Если значение не соответствует ограничениям, показываем ошибку
     } else {
-        isValid.value = true;
+        isValid.value = true; // Если значение корректное, ошибка исчезает
+        await fetchCoinsForAmount(numericValue);
+    }
+
+}, 500); // Задержка 500 мс
+
+const coinsAmount = ref(null);
+
+// Функция для отправки GraphQL запроса количества монет
+const fetchCoinsForAmount = async (amount) => {
+    try {
+        const response = await apolloClient.query({
+            query: GET_COINS_FOR_AMOUNT,
+            variables: {
+                amount: amount,
+                currencyCode: selectedCurrency.value.code,
+                coinTicker: selectedTicker.value,
+            },
+        });
+        coinsAmount.value = response.data.coinsAmount; // Результат запроса
+    } catch (error) {
+        console.error("Ошибка при получении данных", error);
     }
 };
+
+// Очистка полей при смене валюты или монеты
+watch([selectedCode, selectedTicker], () => {
+    amount.value = ""; // Очищаем поле суммы
+    coinsAmount.value = null; // Очищаем результат запроса
+    isValid.value = true; // Сбрасываем состояние валидации
+});
 
 </script>
 

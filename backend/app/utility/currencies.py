@@ -1,7 +1,4 @@
-import os
-import re
 from decimal import Decimal
-
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.chrome.service import Service
@@ -10,9 +7,12 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.remote.remote_connection import RemoteConnection
 from bs4 import BeautifulSoup
 import time
 import logging
+import re
+
 
 logger = logging.getLogger()
 
@@ -20,27 +20,31 @@ logger = logging.getLogger()
 def fetch_exchange_rates():
     """ получение курсов Т-банка usd/rub покупка, byn -> rub обмен"""
     # Настройки для работы в фоновом режиме
-    chrome_options = Options()
-    chrome_options.binary_location = "/usr/bin/chromium-browser"
-    chrome_options.add_argument("--headless")  # Фоновый режим (без интерфейса браузера)
-    chrome_options.add_argument("--disable-gpu")  # Отключение GPU для совместимости
-    chrome_options.add_argument("--no-sandbox")  # Полезно для работы в контейнере
-    chrome_options.add_argument("--disable-dev-shm-usage")  # Устранение ограничения памяти
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")  # Убираем флаг автоматизации
-    chrome_options.add_argument("--window-size=1920,1080")  # Размер окна
+    options = Options()
+    options.add_argument("--headless")  # Фоновый режим (без интерфейса браузера)
+    options.add_argument("--disable-gpu")  # Отключение GPU для совместимости
+    options.add_argument("--no-sandbox")  # Полезно для работы в контейнере
+    options.add_argument("--disable-dev-shm-usage")  # Устранение ограничения памяти
+    options.add_argument("--disable-blink-features=AutomationControlled")  # Убираем флаг автоматизации
 
     # Реалистичный user-agent
     user_agent = (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/110.0.5481.77 Safari/537.36"
     )
-    chrome_options.add_argument(f"user-agent={user_agent}")
 
-    # Автоматическая установка ChromeDriver
-    service = Service(executable_path="/usr/bin/chromedriver")
+    options.add_argument(f"user-agent={user_agent}")
 
-    # Запуск Selenium WebDriver
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    # Для разработки
+    # service = Service(ChromeDriverManager().install())  # Автоматическая установка ChromeDriver
+    # driver = webdriver.Chrome(service=service, options=options)
+
+    # Для контейнера доступного по порту 4444
+    selenium_url = "http://selenium:4444/wd/hub"
+    driver = webdriver.Remote(
+        command_executor=selenium_url,
+        options=options
+    )
 
     # для действий(например навести мышь)
     actions = ActionChains(driver)

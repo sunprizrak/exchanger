@@ -16,6 +16,10 @@ services:
             POSTGRES_DB: exchanger
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
+    selenium:
+        image: selenium/standalone-chromium:latest
+        ports:
+            - "4444:4444"
     redis:
         image: redis:7.2.5-alpine
         hostname: redis
