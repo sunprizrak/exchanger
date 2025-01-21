@@ -29,6 +29,13 @@ class Coin(models.Model):
         verbose_name = "Монета"
         verbose_name_plural = "Монеты"
 
+    def price(self, currency_code):
+        field_name = f'price_{currency_code.lower()}'
+
+        if hasattr(self, field_name):
+            return getattr(self, field_name)
+        return None
+
     def __str__(self):
         return self.name
 

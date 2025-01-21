@@ -3,7 +3,7 @@ from .models import Coin
 from .types import CoinType
 from graphql import GraphQLError
 
-from .utility import calculate_coin_amount
+from utility.coins import calculate_coin_amount
 
 
 class Query(graphene.ObjectType):
@@ -29,9 +29,9 @@ class Query(graphene.ObjectType):
     def resolve_all_coins(root, info):
         return Coin.objects.all()
 
-    def resolve_coins_amount(self, info, amount, currency_code, coin_ticker):
+    def resolve_coins_amount(root, info, amount, currency_code, coin_ticker, pay='SBP'):
         try:
             # Рассчитываем количество монет
-            return calculate_coin_amount(amount, currency_code, coin_ticker)
+            return calculate_coin_amount(amount, currency_code, coin_ticker, pay)
         except Exception as e:
             raise GraphQLError(f"Ошибка: {str(e)}")

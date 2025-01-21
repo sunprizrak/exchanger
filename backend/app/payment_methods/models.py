@@ -86,13 +86,40 @@ class Currency(models.Model):
 
 
 class PaymentMethod(models.Model):
-    name = models.CharField(verbose_name="Название", max_length=50, unique=True, )  # PayPal, Credit Card, etc.
+    name = models.CharField(verbose_name="Название", max_length=50, unique=True, ) # PayPal, Credit Card, etc.
+    comm_percent = models.DecimalField(
+        verbose_name="Комиссия(%)",
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    max_comm_money = models.DecimalField(
+        verbose_name="Максимальная комиссия(сумма)",
+        max_digits=15,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
     description = models.TextField(verbose_name="Описание", blank=True, null=True, )
     currencies = models.ManyToManyField(Currency, verbose_name="Поддерживаемые валюты", related_name="payment_methods")
 
     class Meta:
         verbose_name = "Способ оплаты"
         verbose_name_plural = "Способы оплаты"
+
+    def commission(self, currency, price):
+        percent = price * (self.comm_percent / 100)
+
+        if self.max_comm_money:
+            max_comm_money = self.max_comm_money if currency.code == 'RUB' else self.max_comm_money / currency.price_rub
+
+            if percent > max_comm_money:
+                return max_comm_money.quantize(Decimal('0.01'))
+            else:
+                return Decimal(percent).quantize(Decimal('0.01'))
+        else:
+            return percent.quantize(Decimal('0.01'))
 
     def __str__(self):
         return self.name

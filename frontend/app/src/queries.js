@@ -38,9 +38,14 @@ export const GET_ALL_CURRENCIES = gql`
     },
 `;
 
-
 export const GET_COINS_FOR_AMOUNT = gql`
     query ($amount: Float!, $currencyCode: String!, $coinTicker: String!) {
         coinsAmount(amount: $amount, currencyCode: $currencyCode, coinTicker: $coinTicker)
+    },
+`;
+
+export const GET_AMOUNT_FOR_COINS = gql`
+    query ($amount: Float!, $currencyCode: String!, $coinTicker: String!) {
+        currencyAmount(amount: $amount, currencyCode: $currencyCode, coinTicker: $coinTicker)
     },
 `;

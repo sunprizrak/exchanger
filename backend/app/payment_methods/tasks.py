@@ -1,5 +1,5 @@
 from decimal import Decimal
-from utility.currencies import fetch_exchange_rates
+from utility.update_currencies_rate import fetch_exchange_rates
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from .models import Currency

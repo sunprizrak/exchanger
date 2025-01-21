@@ -23,16 +23,16 @@
                     <div class="box-input">
                         <input
                             type="text"
-                            v-model="amount"
-                            @input="validateAmount"
-                            :min="minAmount"
-                            :max="maxAmount"
+                            v-model="amountCurrency"
+                            @input="validateCurrencyInput"
+                            :min="minAmountCurrency"
+                            :max="maxAmountCurrency"
                             placeholder="Введите сумму"
                             required
                         />
-                        <p class="error" v-if="!isValid">
-                            <span v-if="amount < minAmount">min: {{ selectedCurrency.symbol }}{{ minAmount.toFixed(2) }}</span>
-                            <span v-else-if="amount > maxAmount">max: {{ selectedCurrency.symbol }}{{ maxAmount.toFixed(2) }}</span>
+                        <p class="error" v-if="!isValidCurrency">
+                            <span v-if="amountCurrency < minAmountCurrency">min: {{ selectedCurrency.symbol }}{{ minAmountCurrency.toFixed(2) }}</span>
+                            <span v-else-if="amountCurrency > maxAmountCurrency">max: {{ selectedCurrency.symbol }}{{ maxAmountCurrency.toFixed(2) }}</span>
                         </p>
                     </div>
                 </div>
@@ -58,10 +58,17 @@
                     </div>
                     <div class="box-input">
                         <input
-                            type="number"
-                            placeholder="колличество"
-                            :value="coinsAmount"
+                            type="text"
+                            v-model="amountCoins"
+                            @input="validateCoinsInput"
+                            :min="minAmountCoins"
+                            :max="maxAmountCoins"
+                            placeholder="количество"
                         />
+                        <p class="error" v-if="!isValidCoins">
+                            <span v-if="amountCoins < minAmountCoins">min: {{ minAmountCoins.toFixed(8) }}</span>
+                            <span v-else-if="amountCoins > maxAmountCoins">max: {{ maxAmountCoins.toFixed(8) }}</span>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -79,7 +86,41 @@ import { useCurrenciesStore } from "@/stores/currency";
 import { computed, ref, watchEffect, watch } from "vue";
 import debounce from 'lodash.debounce';
 import { apolloClient } from "@/apollo-config";
-import { GET_COINS_FOR_AMOUNT } from "@/queries";
+import { GET_COINS_FOR_AMOUNT, GET_AMOUNT_FOR_COINS } from "@/queries";
+
+// Функция для получения количества монет по сумме
+const fetchCoinsForAmount = async (amount, currencyCode, coinTicker) => {
+    try {
+        const response = await apolloClient.query({
+            query: GET_COINS_FOR_AMOUNT,
+            variables: {
+                amount: amount,
+                currencyCode: currencyCode,
+                coinTicker: coinTicker,
+            },
+        });
+        return response.data.coinsAmount; // Результат запроса
+    } catch (error) {
+        console.error("Ошибка при получении данных", error);
+    }
+};
+
+// Запрос для получения суммы по количеству монет
+const fetchAmountForCoins = async (amount, currencyCode, coinTicker) => {
+    try {
+        const response = await apolloClient.query({
+            query: GET_AMOUNT_FOR_COINS,
+            variables: {
+                amount: amount,
+                currencyCode: currencyCode,
+                coinTicker: coinTicker,
+            },
+        });
+        return response.data.currencyAmount; // Результат запроса
+    } catch (error) {
+        console.error("Ошибка при получении суммы", error);
+    }
+};
 
 
 const currenciesStore = useCurrenciesStore();
@@ -120,76 +161,148 @@ const selectedCoin = computed(() => {
 
 
 // Вычисляем минимальную и максимальную сумму на основе выбранной валюты
-const minAmount = computed(() => {
+const minAmountCurrency = computed(() => {
     const value = selectedCurrency.value?.minAmount || 0;
     return parseFloat(value); // Преобразуем в число
 });
 
-const maxAmount = computed(() => {
+const maxAmountCurrency = computed(() => {
     const value = selectedCurrency.value?.maxAmount || Infinity;
     return parseFloat(value); // Преобразуем в число
 });
 
-const amount = ref('');  // Локальное состояние для суммы
-const isValid = ref(true);  // Состояние для валидации
+const amountCurrency = ref('');  // Локальное состояние для суммы
+const isValidCurrency = ref(true);  // Состояние для валидации
 
-// Функция для валидации ввода
-const validateAmount = debounce(async (event) => {
+// Функция для валидации суммы
+const validateCurrencyInput = debounce(async (event) => {
     let value = event.target.value;
 
-    // Оставляем только цифры и точку
-    value = value.replace(/[^\d.]/g, '');
+    // Оставляем только цифры, точку и запятую
+    value = value.replace(/[^\d.,]/g, '');
 
-    // Ограничиваем количество знаков после точки до 2
+    // Заменяем запятую на точку, если точка еще нет
+    if (!value.includes('.')) {
+        value = value.replace(',', '.');
+    } else {
+        // Если точка уже есть, удаляем запятую
+        value = value.replace(',', '');
+    }
+
+    // Убираем все дополнительные точки, оставляем только первую
     const parts = value.split('.');
     if (parts.length > 1) {
-        // Оставляем только первые два знака после точки
-        parts[1] = parts[1].slice(0, 2);
-        value = parts.join('.');
+        value = parts[0] + '.' + parts[1].slice(0, 2); // Ограничиваем 2 знаками после точки
+    } else {
+        value = parts[0];
     }
 
     // Обновляем значение
-    amount.value = value;
+    amountCurrency.value = value;
 
     // Проверка на минимальное и максимальное значение
-    const numericValue = parseFloat(amount.value || 0); // Преобразуем строку в число
+    const numericValue = parseFloat(amountCurrency.value || 0); // Преобразуем строку в число
 
     // Проверка на пустое поле и отправка запроса
-    if (amount.value === '') {
-        isValid.value = true; // Если поле пустое, ошибка не показывается
-    } else if (numericValue < minAmount.value || numericValue > maxAmount.value) {
-        isValid.value = false; // Если значение не соответствует ограничениям, показываем ошибку
+    if (amountCurrency.value === '') {
+        isValidCurrency.value = true; // Если поле пустое, ошибка не показывается
+        amountCoins.value = '';
+    } else if (numericValue < minAmountCurrency.value || numericValue > maxAmountCurrency.value) {
+        isValidCurrency.value = false; // Если значение не соответствует ограничениям, показываем ошибку
+        amountCoins.value = '';
     } else {
-        isValid.value = true; // Если значение корректное, ошибка исчезает
-        await fetchCoinsForAmount(numericValue);
+        isValidCurrency.value = true; // Если значение корректное, ошибка исчезает
+        amountCoins.value = await fetchCoinsForAmount(numericValue, selectedCurrency.value.code, selectedTicker.value);
     }
 
 }, 500); // Задержка 500 мс
 
-const coinsAmount = ref(null);
 
-// Функция для отправки GraphQL запроса количества монет
-const fetchCoinsForAmount = async (amount) => {
+// Вычисляем минимальную и максимальную сумму монеты на основе валюты
+const minAmountCoins = ref(null);
+const maxAmountCoins = ref(null);
+
+const updateMinMaxAmountCoins = async () => {
     try {
-        const response = await apolloClient.query({
-            query: GET_COINS_FOR_AMOUNT,
-            variables: {
-                amount: amount,
-                currencyCode: selectedCurrency.value.code,
-                coinTicker: selectedTicker.value,
-            },
-        });
-        coinsAmount.value = response.data.coinsAmount; // Результат запроса
+        if (!selectedCurrency.value || !selectedCurrency.value.code) {
+            return;
+        }
+
+        if (minAmountCurrency.value) {
+            const valueMin = await fetchCoinsForAmount(minAmountCurrency.value, selectedCurrency.value.code, selectedTicker.value);
+            minAmountCoins.value = parseFloat(valueMin) || 0; // Преобразуем в число, подстраховываемся от undefined
+        }
+
+        if (maxAmountCurrency.value) {
+            const valueMax = await fetchCoinsForAmount(maxAmountCurrency.value, selectedCurrency.value.code, selectedTicker.value);
+            maxAmountCoins.value = parseFloat(valueMax) || Infinity; // Преобразуем в число, подстраховываемся от undefined
+        }
     } catch (error) {
-        console.error("Ошибка при получении данных", error);
+        console.error("Ошибка при получении данных в updateMinMaxAmountCoins", error);
     }
 };
 
+watchEffect(() => {
+    if (
+        (minAmountCurrency.value !== null && minAmountCurrency.value !== undefined) ||
+        (maxAmountCurrency.value !== null && maxAmountCurrency.value !== undefined)
+    ) {
+        updateMinMaxAmountCoins();
+    }
+});
+
+
+const amountCoins= ref(''); // Локальное состояние для количества монет
+const isValidCoins = ref(true);  // Состояние для валидации
+
+const validateCoinsInput = debounce(async (event) => {
+    let value = event.target.value;
+
+    // Оставляем только цифры, точку и запятую
+    value = value.replace(/[^\d.,]/g, '');
+
+    // Заменяем запятую на точку, если точка еще нет
+    if (!value.includes('.')) {
+        value = value.replace(',', '.');
+    } else {
+        // Если точка уже есть, удаляем запятую
+        value = value.replace(',', '');
+    }
+
+    // Убираем все дополнительные точки, оставляем только первую
+    const parts = value.split('.');
+    if (parts.length > 1) {
+        value = parts[0] + '.' + parts[1].slice(0, 8); // Ограничиваем 8 знаками после точки
+    } else {
+        value = parts[0];
+    }
+
+    // Обновляем значение
+    amountCoins.value = value;
+
+    // Проверка на минимальное и максимальное значение
+    const numericValue = parseFloat(amountCoins.value || 0); // Преобразуем строку в число
+
+    // Проверка на пустое поле и отправка запроса
+    if (amountCoins.value === '') {
+        isValidCoins.value = true; // Если поле пустое, ошибка не показывается
+        amountCurrency.value = '';
+    } else if (numericValue < minAmountCoins.value || numericValue > maxAmountCoins.value) {
+        isValidCoins.value = false; // Если значение не соответствует ограничениям, показываем ошибку
+        amountCurrency.value = '';
+    } else {
+        isValidCoins.value = true; // Если значение корректное, ошибка исчезает
+        amountCurrency.value = await fetchAmountForCoins(numericValue, selectedCurrency.value.code, selectedTicker.value);
+    }
+}, 500);
+
 // Очистка полей при смене валюты или монеты
 watch([selectedCode, selectedTicker], () => {
-    amount.value = ""; // Очищаем поле суммы
-    coinsAmount.value = null; // Очищаем результат запроса
-    isValid.value = true; // Сбрасываем состояние валидации
+    amountCurrency.value = ""; // Очищаем поле суммы
+    amountCoins.value = ""; // Очищаем поле количества монет
+    // Сбрасываем состояние валидации
+    isValidCurrency.value = true;
+    isValidCoins.value = true;
 });
 
 </script>

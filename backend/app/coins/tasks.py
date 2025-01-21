@@ -2,7 +2,7 @@ from celery import shared_task, chain
 from celery.utils.log import get_task_logger
 from payment_methods.tasks import update_currencies_price
 from .models import Coin
-from .utility import (
+from utility.coins import (
     price_coin_usdt,
     price_coin_rub,
     price_coin_other_currencies,
