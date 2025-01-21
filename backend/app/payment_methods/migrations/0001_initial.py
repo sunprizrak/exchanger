@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('code', models.CharField(max_length=3, unique=True, verbose_name='Код валюты')),
                 ('name', models.CharField(max_length=50, verbose_name='Название')),
-                ('icon', models.ImageField(blank=True, default='default_image.png', upload_to=payment_methods.models.path_coin_icon, verbose_name='Иконка')),
+                ('icon', models.ImageField(blank=True, default='default_image.png', upload_to=payment_methods.models.path_currency_icon, verbose_name='Иконка')),
                 ('symbol', models.CharField(blank=True, max_length=10, verbose_name='Символ валюты')),
             ],
             options={

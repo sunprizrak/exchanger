@@ -18,9 +18,9 @@ class Query(graphene.ObjectType):
         # Загружаем все валюты с предзагруженными методами оплаты
         return Currency.objects.prefetch_related('payment_methods').all()
 
-    def resolve_currency_amount(root, info, amount, currency_code, coin_ticker, pay="SBP"):
+    def resolve_currency_amount(root, info, amount, currency_code, coin_ticker):
         try:
             # Рассчитываем количество монет
-            return calculate_currency_amount(amount, currency_code, coin_ticker, pay)
+            return calculate_currency_amount(amount, currency_code, coin_ticker)
         except Exception as e:
             raise GraphQLError(f"Ошибка: {str(e)}")

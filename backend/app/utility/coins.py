@@ -1,9 +1,9 @@
 from decimal import Decimal
 import requests
 import logging
-from payment_methods.models import Currency, PaymentMethod
+from payment_methods.models import Currency
 from coins.models import Coin
-from utility.common import calculate_profit
+from utility.common import calculate_profit, payment_commission
 
 logger = logging.getLogger()
 
@@ -49,7 +49,7 @@ def price_coin_other_currencies(coin_rub, currency_code):
     return coin_currency.quantize(Decimal('0.01'))
 
 
-def calculate_coin_amount(money_amount, currency_code, coin_ticker, pay):
+def calculate_coin_amount(money_amount, currency_code, coin_ticker):
     """
     Метод для вычисления количества монет на основе введённой суммы,
     с учётом комиссии и выбранной валюты.
@@ -57,16 +57,15 @@ def calculate_coin_amount(money_amount, currency_code, coin_ticker, pay):
 
     coin = Coin.objects.get(ticker=coin_ticker)
     currency = Currency.objects.get(code=currency_code)
-    payment_method = PaymentMethod.objects.get(name=pay)
 
     price = coin.price(currency_code)  # Цена одной монеты в нужной валюте
     money_amount = Decimal(money_amount)  # суммарная стоимость монет
 
     profit = calculate_profit(money_amount=money_amount, currency=currency)  # Добавочная стоимость A.K.A прибыль
-    payment_commission = payment_method.commission(currency=currency, price=money_amount)  # комиссия платёжной системы
+    pay_commission = payment_commission(currency=currency, price=money_amount)  # комиссия платёжной системы
     rate_network = coin.network_rate * currency.price_usd
 
-    total_money_amount = money_amount - payment_commission - rate_network - profit
+    total_money_amount = money_amount - pay_commission - rate_network - profit
 
     # Рассчитываем количество монет
     amount_of_coins = total_money_amount / price

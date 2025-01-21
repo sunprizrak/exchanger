@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.db import models
 
 
-def path_coin_icon(instance, filename):
+def path_currency_icon(instance, filename):
     return 'currency/icons/{currency_name}-{filename}'.format(
         currency_name=instance.name,
         filename=filename,
@@ -13,7 +13,7 @@ def path_coin_icon(instance, filename):
 class Currency(models.Model):
     code = models.CharField(verbose_name="Код валюты", max_length=3, unique=True, )  # BYN, RUB, etc.
     name = models.CharField(verbose_name="Название", max_length=50)  # Dollar, Euro, etc.
-    icon = models.ImageField(verbose_name="Иконка", upload_to=path_coin_icon, default='default_image.png', blank=True)
+    icon = models.ImageField(verbose_name="Иконка", upload_to=path_currency_icon, default='default_image.png', blank=True)
     symbol = models.CharField(max_length=10, blank=True, verbose_name="Символ валюты")  # $, €, etc.
     price_usd = models.DecimalField(
         verbose_name="Цена в USD",
@@ -85,41 +85,22 @@ class Currency(models.Model):
         return f"{self.name} ({self.code})"
 
 
+def path_payment_method_icon(instance, filename):
+    return 'payment_methods/icons/{pay_id}-{filename}'.format(
+        pay_id=instance.id,
+        filename=filename,
+    )
+
+
 class PaymentMethod(models.Model):
-    name = models.CharField(verbose_name="Название", max_length=50, unique=True, ) # PayPal, Credit Card, etc.
-    comm_percent = models.DecimalField(
-        verbose_name="Комиссия(%)",
-        max_digits=5,
-        decimal_places=2,
-        null=True,
-        blank=True,
-    )
-    max_comm_money = models.DecimalField(
-        verbose_name="Максимальная комиссия(сумма)",
-        max_digits=15,
-        decimal_places=2,
-        null=True,
-        blank=True,
-    )
+    name = models.CharField(verbose_name="Название", max_length=50, unique=True)  # PayPal, Credit Card, etc.
+    icon = models.ImageField(verbose_name='Картинка', upload_to=path_payment_method_icon, default='default_image.png', blank=True)
     description = models.TextField(verbose_name="Описание", blank=True, null=True, )
     currencies = models.ManyToManyField(Currency, verbose_name="Поддерживаемые валюты", related_name="payment_methods")
 
     class Meta:
         verbose_name = "Способ оплаты"
         verbose_name_plural = "Способы оплаты"
-
-    def commission(self, currency, price):
-        percent = price * (self.comm_percent / 100)
-
-        if self.max_comm_money:
-            max_comm_money = self.max_comm_money if currency.code == 'RUB' else self.max_comm_money / currency.price_rub
-
-            if percent > max_comm_money:
-                return max_comm_money.quantize(Decimal('0.01'))
-            else:
-                return Decimal(percent).quantize(Decimal('0.01'))
-        else:
-            return percent.quantize(Decimal('0.01'))
 
     def __str__(self):
         return self.name

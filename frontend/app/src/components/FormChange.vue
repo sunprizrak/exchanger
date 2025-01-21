@@ -1,4 +1,3 @@
-
 <template>
     <div class="form-wrap">
         <form>
@@ -72,9 +71,17 @@
                     </div>
                 </div>
             </div>
+            <hr/>
+            <div>
+                <span>Методы оплаты:</span>
+                <ul v-if="selectedCurrency.paymentMethods && selectedCurrency.paymentMethods.length > 0">
+                    <li v-for="method in selectedCurrency.paymentMethods" :key="method.id">{{ method.name }}</li>
+                </ul>
+                <p v-else>Нет доступных методов оплаты</p>
+            </div>
         </form>
-        <div class="form-button">
-            <div>купить</div>
+        <div class="form-button" @click="handleSubmit">
+            <div>КУПИТЬ</div>
         </div>
     </div>
 </template>
@@ -305,23 +312,31 @@ watch([selectedCode, selectedTicker], () => {
     isValidCoins.value = true;
 });
 
+const handleSubmit = () => {
+    // Проверка валидности значений
+    //if (isValidCurrency.value && isValidCoins.value && amountCurrency.value && amountCoins.value) {
+    //    isFlipped.value = !isFlipped.value; // Разворачиваем/сворачиваем форму
+    //}
+    isFlipped.value = !isFlipped.value; // Разворачиваем/сворачиваем форму
+};
+
 </script>
 
 <style lang="scss" scoped>
+
 .form-wrap {
     display: flex;
     flex-direction: column;
     width: 80%;
     height: auto;
-    position: absolute;
     border-radius: 7px;
-
     border: 4px solid var(--color-border);
 
     form {
         display: flex;
         flex-direction: column;
         padding: 10px;
+        position: relative;
 
         .group-input {
             display: flex;
@@ -434,10 +449,6 @@ watch([selectedCode, selectedTicker], () => {
             }
         }
     }
-
-
 }
-
-
 
 </style>
