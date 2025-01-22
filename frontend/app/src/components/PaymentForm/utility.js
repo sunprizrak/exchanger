@@ -1,4 +1,5 @@
 import { apolloClient } from "@/apollo-config";
+import { GET_COINS_FOR_AMOUNT, GET_AMOUNT_FOR_COINS } from "@/queries";
 
 
 // Функция для получения количества монет по сумме

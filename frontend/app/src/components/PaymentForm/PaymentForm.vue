@@ -111,7 +111,6 @@ import { useCoinsStore } from "@/stores/coin";
 import { useCurrenciesStore } from "@/stores/currency";
 import debounce from 'lodash.debounce';
 import { apolloClient } from "@/apollo-config";
-import { GET_COINS_FOR_AMOUNT, GET_AMOUNT_FOR_COINS } from "@/queries";
 import {
     updateMinMaxAmountCoins,
     fetchCoinsForAmount,
