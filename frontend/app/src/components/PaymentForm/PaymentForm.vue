@@ -315,7 +315,6 @@ const validateForm = () => {
 };
 
 
-
 const handleSubmit = () => {
     isActivePayButton.value = true;
     isSubmitted.value = true;
@@ -327,7 +326,13 @@ const handleSubmit = () => {
 
      // Вызываем функцию валидации
     if (validateForm()) {
+        const numericAmountCurrency = parseFloat(amountCurrency.value);
+        const numericAmountCoins = parseFloat(amountCoins.value);
+        const stringSelectedMethod = selectedMethod.value.name;
 
+        console.log(numericAmountCurrency);
+        console.log(numericAmountCoins);
+        console.log(stringSelectedMethod);
 
         // submitForm();
     } else {
