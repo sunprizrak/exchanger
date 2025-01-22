@@ -1,10 +1,10 @@
 <script setup>
-import FormChange from '@/components/FormChange.vue';
+import PaymentForm from '@/components/PaymentForm/PaymentForm.vue';
 </script>
 
 <template>
     <main>
-        <FormChange />
+        <PaymentForm />
     </main>
 </template>
 

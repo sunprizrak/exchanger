@@ -5,9 +5,16 @@ from .models import Currency, PaymentMethod
 
 
 class PaymentMethodType(DjangoObjectType):
+    full_icon_url = graphene.String()
 
     class Meta:
         model = PaymentMethod
+
+    def resolve_full_icon_url(self, info):
+        """Этот метод будет возвращать полный URL для иконки."""
+        if self.icon:
+            return f"{settings.SITE_URL}{self.icon.url}"
+        return None
 
 
 class CurrencyType(DjangoObjectType):

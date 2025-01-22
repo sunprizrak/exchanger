@@ -95,7 +95,7 @@ def path_payment_method_icon(instance, filename):
 class PaymentMethod(models.Model):
     name = models.CharField(verbose_name="Название", max_length=50, unique=True)  # PayPal, Credit Card, etc.
     icon = models.ImageField(verbose_name='Картинка', upload_to=path_payment_method_icon, default='default_image.png', blank=True)
-    description = models.TextField(verbose_name="Описание", blank=True, null=True, )
+    description = models.TextField(verbose_name="Описание", blank=True, null=True)
     currencies = models.ManyToManyField(Currency, verbose_name="Поддерживаемые валюты", related_name="payment_methods")
 
     class Meta:

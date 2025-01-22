@@ -33,6 +33,7 @@ export const GET_ALL_CURRENCIES = gql`
             paymentMethods {
                 id
                 name
+                fullIconUrl
             }
         }
     },

@@ -1,0 +1,185 @@
+.form-wrap {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    height: auto;
+    border-radius: 7px;
+    border: 4px solid var(--color-border);
+
+    form {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        position: relative;
+
+        .amount-input {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+
+            span {
+                display: inline-block;
+                white-space: nowrap;
+                font-weight: bold;
+                font-size: 12px;
+            }
+
+            .bottom-line {
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+
+                .country, .coins {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    width: fit-content;
+
+                    img {
+                        height: 35px;
+                        width: 35px;
+                        border-radius: 50%;
+                    }
+
+                    div {
+                        width: fit-content;
+
+
+                        select {
+                            background-color: transparent;
+                            border: 0;
+                            outline: none;
+                            box-shadow: none;
+                            font-weight: bold;
+                        }
+
+                        span {
+                            display: inline-block;
+                            white-space: nowrap;
+                            font-weight: bold;
+                            font-size: 12px;
+                            padding-left: 0.75rem;
+                        }
+                    }
+                }
+
+                .box-input {
+                    position: relative;
+                    height: auto;
+
+                    input {
+                        background-color: transparent;
+                        box-sizing: border-box;
+                        border: 0;
+                        outline: none;
+                        box-shadow: none;
+                        text-align: right;
+                        padding: 0;
+                        caret-color: var(--color-text);
+                        width: 100%;
+                        height: 100%;
+                    }
+
+                    p {
+                        position: absolute;
+                        right: 0;
+                        bottom: 0;
+                    }
+                }
+            }
+        }
+    }
+
+    .form-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 50px;
+        width: 100%;
+        background-color: #000;
+        padding-top: 4px;
+
+        div {
+            cursor: pointer;
+            background-color: var(--color-background);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1px;
+            transition: 0.3s;
+            box-shadow: inset 0 20px 4px -21px rgba(255,255,255,0.4), 0 19px 13px 0 rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 2;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            font-weight: bold;
+            user-select: none;
+
+            /* Псевдокласс для временной анимации */
+            &.active-click {
+                background-image: linear-gradient(to top, #151515 0%, #1d1d1d 100%);
+                box-shadow: inset 0 16px 14px -21px transparent, 0 0px 13px 0 rgba(0,0,0,0.3), inset 0 0 7px 2px rgba(0,0,0,0.4);
+                z-index: 0;
+                color: #add8e6;
+                text-shadow: 0 0 0px #add8e6, 0 0 5px #add8e6;
+                transform: scale(0.95); /* Эффект нажатия */
+                transition: all 0.3s ease;
+            }
+        }
+    }
+
+    .payment-methods {
+        span {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        ul {
+
+            li {
+                display: flex;
+                align-items: center;
+                padding-top: 5px;
+                padding-bottom: 5px;
+                height: 40px;
+                transition: all 0.3s ease;
+
+                label {
+                    display: flex;
+                    align-items: center;
+                    text-align: center;
+                    width: 100%;
+                    cursor: pointer;
+
+                    input {
+                        color: green;
+                        margin-left: 10px;
+                        appearance: none; /* Убираем стандартный стиль браузера */
+                        -webkit-appearance: none; /* Для Safari */
+                        -moz-appearance: none; /* Для Firefox */
+
+                        &:focus {
+                            @apply border-green-500; /* Зеленая граница при фокусе */
+                            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2); /* Легкая тень вокруг */
+                        }
+                    }
+
+                    span {
+                        width: 100%;
+                        transition: 0.2s;
+
+                        &.active {
+                            color: #add8e6; /* Светлый оттенок синего */
+                            text-shadow: 0 0 0px #add8e6, 0 0 5px #add8e6;
+                        }
+                    }
+                }
+            }
+        }
+
+        p {
+            text-align: center;
+        }
+    }
+}
