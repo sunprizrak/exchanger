@@ -5,25 +5,49 @@ from .types import OrderType
 
 class CreateOrder(graphene.Mutation):
     order = graphene.Field(OrderType)
+    message = graphene.String()
 
     class Arguments:
         coin_name = graphene.String(required=True)
+        coin_ticker = graphene.String(required=True)
         coin_amount = graphene.Decimal(required=True)
         total_price = graphene.Decimal(required=True)
+        currency = graphene.String(required=True)
+        currency_code = graphene.String(required=True)
+        payment_method = graphene.String(required=True)
 
-    def mutate(self, info, coin_name, coin_amount, total_price):
-        # Получаем текущего пользователя (если вы хотите, чтобы заказ был привязан к пользователю)
-        user = info.context.user
+    def mutate(
+            self,
+            info,
+            coin_name,
+            coin_ticker,
+            coin_amount,
+            currency,
+            currency_code,
+            total_price,
+            payment_method
+    ):
+        user = info.context.user  # Получаем текущего пользователя
+
+        if not user or not user.is_authenticated:
+            raise Exception("Пользователь не аутентифицирован")
 
         # Создаем новый заказ
         order = Order.objects.create(
             user=user,
             coin_name=coin_name,
+            coin_ticker=coin_ticker,
             coin_amount=coin_amount,
+            currency=currency,
+            currency_code=currency_code,
             total_price=total_price,
+            payment_method=payment_method,
         )
 
-        return CreateOrder(order=order)
+        # Значение для поля message
+        message = "Ваша заявка принята"
+
+        return CreateOrder(order=order, message=message)
 
 
 class Mutation(graphene.ObjectType):

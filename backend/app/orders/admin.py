@@ -4,4 +4,13 @@ from .models import Order
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        "coin_name",
+        "coin_ticker",
+        "coin_amount",
+        "currency",
+        "currency_code",
+        "total_price",
+        "payment_method",
+        "status",
+    )

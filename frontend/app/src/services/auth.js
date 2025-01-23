@@ -20,7 +20,8 @@ export async function telegramAuth(initData) {
         userStore.setToken(token);
         userStore.setUser(user);
     } catch (error) {
-        console.error("Ошибка авторизации:", error);
+        // alert("Что-то пошло не так. Мы уже работаем над этим.");
+        alert(error);
     }
 };
 

@@ -7,9 +7,13 @@ User = get_user_model()
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
-    coin_name = models.CharField(verbose_name='Название', max_length=255)
+    coin_name = models.CharField(verbose_name='Название', max_length=50)
+    coin_ticker = models.CharField(verbose_name='Tикер', max_length=50, null=True)
     coin_amount = models.DecimalField(verbose_name='Количество', max_digits=10, decimal_places=2)
     total_price = models.DecimalField(verbose_name='Итоговая Цена', max_digits=10, decimal_places=2)
+    currency = models.CharField(verbose_name="Валюта", max_length=50, null=True)
+    currency_code = models.CharField(verbose_name="Код валюты", max_length=3, null=True)
+    payment_method = models.CharField(verbose_name="Платёжный метод", max_length=50, null=True)
     status = models.CharField(
         verbose_name='Статус',
         max_length=50,

@@ -115,7 +115,8 @@ import {
     updateMinMaxAmountCoins,
     fetchCoinsForAmount,
     fetchAmountForCoins,
-} from './utility.js';
+    submitPaymentForm,
+} from './utility';
 
 
 // <<<STORES>>>
@@ -189,19 +190,21 @@ watch([selectedCode, selectedTicker], () => {
     isValidCoins.value = true;
 });
 
-watchEffect(() => {
+watchEffect(async () => {
     if (
         (minAmountCurrency.value !== null && minAmountCurrency.value !== undefined) ||
         (maxAmountCurrency.value !== null && maxAmountCurrency.value !== undefined)
     ) {
-        updateMinMaxAmountCoins(
-            selectedCurrency,
-            selectedTicker,
-            minAmountCurrency,
-            minAmountCoins,
-            maxAmountCurrency,
-            maxAmountCoins,
-        );
+        const formData = {
+            selectedCurrency: selectedCurrency,
+            selectedTicker: selectedTicker,
+            minAmountCurrency: minAmountCurrency,
+            minAmountCoins: minAmountCoins,
+            maxAmountCurrency: maxAmountCurrency,
+            maxAmountCoins: maxAmountCoins,
+        };
+
+        await updateMinMaxAmountCoins(formData);
     }
 });
 
@@ -238,7 +241,7 @@ const validateCurrencyInput = debounce(async (event) => {
     const numericValue = parseFloat(amountCurrency.value || 0); // Преобразуем строку в число
 
     // Проверка на пустое поле и отправка запроса
-    if (amountCurrency.value === '') {
+    if (amountCurrency.value === '' || amountCurrency.value === '.') {
         isValidCurrency.value = true; // Если поле пустое, ошибка не показывается
         amountCoins.value = '';
     } else if (numericValue < minAmountCurrency.value || numericValue > maxAmountCurrency.value) {
@@ -246,7 +249,14 @@ const validateCurrencyInput = debounce(async (event) => {
         amountCoins.value = '';
     } else {
         isValidCurrency.value = true; // Если значение корректное, ошибка исчезает
-        amountCoins.value = await fetchCoinsForAmount(numericValue, selectedCurrency.value.code, selectedTicker.value);
+
+        const formData = {
+            amount: numericValue,
+            currencyCode: selectedCurrency.value.code,
+            coinTicker: selectedTicker.value,
+        };
+
+        amountCoins.value = await fetchCoinsForAmount(formData);
     }
 
 }, 500); // Задержка 500 мс
@@ -281,7 +291,7 @@ const validateCoinsInput = debounce(async (event) => {
     const numericValue = parseFloat(amountCoins.value || 0); // Преобразуем строку в число
 
     // Проверка на пустое поле и отправка запроса
-    if (amountCoins.value === '') {
+    if (amountCoins.value === '' || amountCoins.value === '.') {
         isValidCoins.value = true; // Если поле пустое, ошибка не показывается
         amountCurrency.value = '';
     } else if (numericValue < minAmountCoins.value || numericValue > maxAmountCoins.value) {
@@ -289,7 +299,14 @@ const validateCoinsInput = debounce(async (event) => {
         amountCurrency.value = '';
     } else {
         isValidCoins.value = true; // Если значение корректное, ошибка исчезает
-        amountCurrency.value = await fetchAmountForCoins(numericValue, selectedCurrency.value.code, selectedTicker.value);
+
+        const formData = {
+            amount: numericValue,
+            currencyCode: selectedCurrency.value.code,
+            coinTicker: selectedTicker.value,
+        };
+
+        amountCurrency.value = await fetchAmountForCoins(formData);
     }
 }, 500);
 
@@ -315,7 +332,7 @@ const validateForm = () => {
 };
 
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
     isActivePayButton.value = true;
     isSubmitted.value = true;
 
@@ -326,20 +343,22 @@ const handleSubmit = () => {
 
      // Вызываем функцию валидации
     if (validateForm()) {
-        const numericAmountCurrency = parseFloat(amountCurrency.value);
-        const numericAmountCoins = parseFloat(amountCoins.value);
-        const stringSelectedMethod = selectedMethod.value.name;
+        const formData = {
+            coinName: selectedCoin.value?.name,
+            coinTicker: selectedTicker.value,
+            coinAmount: amountCoins.value.toFixed(8),
+            currencyName: selectedCurrency.value?.name,
+            currencyCode: selectedCode.value,
+            totalPrice: amountCurrency.value.toFixed(2),
+            paymentMethod: selectedMethod.value?.name,
+        };
 
-        console.log(numericAmountCurrency);
-        console.log(numericAmountCoins);
-        console.log(stringSelectedMethod);
+        console.log(formData);
+        //await submitPaymentForm(formData);
 
-        // submitForm();
     } else {
         console.error("Форма не валидирована");
     }
-
-
 };
 
 </script>
