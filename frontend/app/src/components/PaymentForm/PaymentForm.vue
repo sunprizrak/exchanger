@@ -346,15 +346,14 @@ const handleSubmit = async () => {
         const formData = {
             coinName: selectedCoin.value?.name,
             coinTicker: selectedTicker.value,
-            coinAmount: amountCoins.value.toFixed(8),
-            currencyName: selectedCurrency.value?.name,
+            coinAmount: parseFloat(amountCoins.value),
+            currency: selectedCurrency.value?.name,
             currencyCode: selectedCode.value,
-            totalPrice: amountCurrency.value.toFixed(2),
+            totalPrice: parseFloat(amountCurrency.value),
             paymentMethod: selectedMethod.value?.name,
         };
 
-        console.log(formData);
-        //await submitPaymentForm(formData);
+        await submitPaymentForm(formData);
 
     } else {
         console.error("Форма не валидирована");

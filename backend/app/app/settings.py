@@ -1,4 +1,7 @@
 from pathlib import Path
+
+from django.contrib.auth import get_user_model
+
 from .config import settings
 from celery.schedules import crontab
 
@@ -146,8 +149,13 @@ GRAPHENE = {
     ],
 }
 
+GRAPHQL_JWT = {
+    'JWT_PAYLOAD_HANDLER': 'app.schema.custom_jwt_payload',
+    'JWT_PAYLOAD_GET_USERNAME_HANDLER': lambda payload: payload.get('tg_id'),
+}
+
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = ("http://127.0.0.1:5173", "https://acvmu0-37-214-26-192.ru.tuna.am",)
+CORS_ORIGIN_WHITELIST = ("http://127.0.0.1:5173", "https://d785-2a02-6ea0-c041-2193-00-12.ngrok-free.app",)
 
 TELEGRAM_BOT_TOKEN = settings.tg.telegram_bot_token
 

@@ -1,6 +1,11 @@
-import graphene
+from graphql_jwt.decorators import login_required
 from .models import Order
 from .types import OrderType
+import graphene
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class CreateOrder(graphene.Mutation):
@@ -10,10 +15,10 @@ class CreateOrder(graphene.Mutation):
     class Arguments:
         coin_name = graphene.String(required=True)
         coin_ticker = graphene.String(required=True)
-        coin_amount = graphene.Decimal(required=True)
-        total_price = graphene.Decimal(required=True)
+        coin_amount = graphene.Float(required=True)
         currency = graphene.String(required=True)
         currency_code = graphene.String(required=True)
+        total_price = graphene.Float(required=True)
         payment_method = graphene.String(required=True)
 
     def mutate(
@@ -28,8 +33,13 @@ class CreateOrder(graphene.Mutation):
             payment_method
     ):
         user = info.context.user  # Получаем текущего пользователя
+        logger.error('---------------------------------------')
+        logger.error(info.context)
+        logger.error(f"User: {user}")
 
+        # Если пользователя нет (не аутентифицирован)
         if not user or not user.is_authenticated:
+            logger.error("User is not authenticated.")
             raise Exception("Пользователь не аутентифицирован")
 
         # Создаем новый заказ

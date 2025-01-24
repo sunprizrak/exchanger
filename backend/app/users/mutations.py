@@ -25,10 +25,10 @@ class TelegramAuth(graphene.Mutation):
         init_data = graphene.String(required=True)
 
     def mutate(self, info, init_data):
-        token = settings.TELEGRAM_BOT_TOKEN
+        token_tg = settings.TELEGRAM_BOT_TOKEN
 
         # Проверка валидности данных Telegram
-        user_data = verify_telegram_data(token=token, init_data=init_data)
+        user_data = verify_telegram_data(token=token_tg, init_data=init_data)
 
         if not user_data:
             raise Exception("Недействительные данные Telegram.")
@@ -47,8 +47,8 @@ class TelegramAuth(graphene.Mutation):
         )
 
         # Выдача токена
-        token = get_token(user)
-        return TelegramAuth(user=user, token=token)
+        token_jwt = get_token(user)
+        return TelegramAuth(user=user, token=token_jwt)
 
 
 class Mutation(graphene.ObjectType):
