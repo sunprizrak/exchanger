@@ -40,3 +40,12 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(_('Superuser must have is_superuser=True.'))
         return self._create_with_email(email, password, **extra_fields)
+
+    def get_by_natural_key(self, username=None, telegram_id=None):
+        if telegram_id:
+            try:
+                return self.get(tg_id=telegram_id)
+            except self.model.DoesNotExist:
+                return None
+        elif username:
+            return super().get_by_natural_key(username)

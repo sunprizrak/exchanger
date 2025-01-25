@@ -50,4 +50,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
     def __str__(self):
-        return f'{self.email} {self.tg_id}'
+        if self.is_superuser:
+            return self.email
+        else:
+            return f'{self.tg_username} {self.tg_id}'

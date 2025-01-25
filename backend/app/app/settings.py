@@ -1,9 +1,6 @@
+from datetime import timedelta
 from pathlib import Path
-
-from django.contrib.auth import get_user_model
-
 from .config import settings
-from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,9 +39,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -137,10 +134,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
 
-AUTHENTICATION_BACKENDS = (
-    'graphql_jwt.backends.JSONWebTokenBackend',
-    'users.backends.CustomAuthBackend',
-)
+AUTHENTICATION_BACKENDS = [
+    "graphql_jwt.backends.JSONWebTokenBackend",
+    "users.backends.CustomAuthBackend",
+]
 
 GRAPHENE = {
     "SCHEMA": "app.schema.schema",
@@ -150,12 +147,15 @@ GRAPHENE = {
 }
 
 GRAPHQL_JWT = {
-    'JWT_PAYLOAD_HANDLER': 'app.schema.custom_jwt_payload',
-    'JWT_PAYLOAD_GET_USERNAME_HANDLER': lambda payload: payload.get('tg_id'),
+    'JWT_PAYLOAD_HANDLER': 'users.schema.custom_jwt_payload',
+    'JWT_PAYLOAD_GET_USERNAME_HANDLER': lambda payload: str(payload.get('tg_id')),
+    'JWT_GET_USER_BY_NATURAL_KEY_HANDLER': 'users.schema.custom_get_user_by_natural_key_handler',
+    'JWT_AUTH_HEADER_PREFIX': 'JWT',
+    "JWT_EXPIRATION_DELTA": timedelta(days=1),
 }
 
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = ("http://127.0.0.1:5173", "https://d785-2a02-6ea0-c041-2193-00-12.ngrok-free.app",)
+CORS_ORIGIN_WHITELIST = ("http://127.0.0.1:5173", "https://8557-169-150-196-86.ngrok-free.app")
 
 TELEGRAM_BOT_TOKEN = settings.tg.telegram_bot_token
 

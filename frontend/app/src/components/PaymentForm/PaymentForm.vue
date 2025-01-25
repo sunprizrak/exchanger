@@ -363,5 +363,5 @@ const handleSubmit = async () => {
 </script>
 
 <style lang="scss" scoped>
-@import "./style.scss";
+@use "./style.scss";
 </style>

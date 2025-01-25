@@ -6,6 +6,7 @@ from .types import UserType
 from graphql_jwt.shortcuts import get_token
 from .utility import verify_telegram_data
 
+
 UserModel = get_user_model()
 
 
@@ -24,7 +25,7 @@ class TelegramAuth(graphene.Mutation):
     class Arguments:
         init_data = graphene.String(required=True)
 
-    def mutate(self, info, init_data):
+    def mutate(root, info, init_data):
         token_tg = settings.TELEGRAM_BOT_TOKEN
 
         # Проверка валидности данных Telegram
@@ -34,12 +35,6 @@ class TelegramAuth(graphene.Mutation):
             raise Exception("Недействительные данные Telegram.")
 
         telegram_id, username = user_data
-
-        # Преобразование init_data в словарь
-        try:
-            init_data_dict = dict(item.split("=") for item in init_data.split("&"))
-        except ValueError:
-            raise Exception("Ошибка обработки init_data.")
 
         user, created = UserModel.objects.get_or_create(
             tg_id=telegram_id,

@@ -22,7 +22,7 @@ class CreateOrder(graphene.Mutation):
         payment_method = graphene.String(required=True)
 
     def mutate(
-            self,
+            root,
             info,
             coin_name,
             coin_ticker,
@@ -33,8 +33,11 @@ class CreateOrder(graphene.Mutation):
             payment_method
     ):
         user = info.context.user  # Получаем текущего пользователя
-        logger.error('---------------------------------------')
-        logger.error(info.context)
+        logger.error("Context Headers:")
+        for key, value in info.context.META.items():
+            if key.startswith('HTTP_'):  # HTTP заголовки
+                logger.error(f"{key}: {value}")
+
         logger.error(f"User: {user}")
 
         # Если пользователя нет (не аутентифицирован)

@@ -1,17 +1,10 @@
 import graphene
-from graphql_jwt.utils import jwt_payload
 from users.schema import schema as users_schema
 from users.mutations import Mutation as users_mutations
 from orders.schema import schema as orders_schema
 from orders.mutations import Mutation as orders_mutations
 from coins.schema import schema as coins_schema
 from payment_methods.schema import schema as payment_methods_schema
-
-
-def custom_jwt_payload(user, context):
-    payload = jwt_payload(user, context)
-    payload['tg_id'] = user.tg_id
-    return payload
 
 
 # Объединяем Query
