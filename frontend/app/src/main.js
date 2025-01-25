@@ -9,6 +9,7 @@ import { telegramUtils, initializeTelegram } from '@/services/telegram';
 import { telegramAuth } from '@/services/auth';
 import { useCoinsStore } from "@/stores/coin";
 import { useCurrenciesStore } from "@/stores/currency";
+import Vue3Lottie from 'vue3-lottie';
 
 
 async function main() {
@@ -41,6 +42,7 @@ function createVueApp() {
     const app = createApp(App)
 
     app.use(createPinia())
+        .use(Vue3Lottie)
         .use(router)
         .use(apolloProvider)
         .mount("#app");

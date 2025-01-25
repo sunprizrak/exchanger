@@ -21,13 +21,10 @@ export async function submitPaymentForm(formData) {
         });
 
         // Извлекаем данные из ответа
-        const message = response.data;
-        console.log(message);  // Выводим сообщение от сервера
+        const message = response.data.createOrder.message;
+        return message
     } catch (error) {
-        // alert("Что-то пошло не так. Мы уже работаем над этим.");
-        console.error("GraphQL Errors:", error.graphQLErrors);
-        console.error("Network Error:", error.networkError);
-        console.error("Full Error:", JSON.stringify(error, null, 2));
+        alert("Что-то пошло не так. Мы уже работаем над этим.");
     }
 };
 

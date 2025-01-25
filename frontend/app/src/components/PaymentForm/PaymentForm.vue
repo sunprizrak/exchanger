@@ -1,5 +1,5 @@
 <template>
-    <div class="form-wrap">
+    <div v-if="formVisible" class="form-wrap">
         <form>
             <div class="amount-input">
                 <span>Вы отправляете</span>
@@ -102,6 +102,13 @@
             <div :class="{'active-click': isActivePayButton}" @click="handleSubmit">КУПИТЬ</div>
         </div>
     </div>
+    <div v-if="animationVisible">
+        <Vue3Lottie
+            :animation-data="animHandshake"
+            id="animHandshake"
+            @on-loop-complete="onAnimationFinish"
+        />
+    </div>
 </template>
 
 
@@ -117,6 +124,7 @@ import {
     fetchAmountForCoins,
     submitPaymentForm,
 } from './utility';
+import animHandshake from '@/assets/lottie/handshake.json';
 
 
 // <<<STORES>>>
@@ -138,6 +146,8 @@ const isValidCoins = ref(true);             // Состояние для вал�
 const selectedPaymentMethod = ref(null);
 const isSubmitted = ref(false);
 const isActivePayButton = ref(false);
+const formVisible = ref(true);              // Форма видна
+const animationVisible = ref(false);    // Анимация видна
 
 
 // <<<COMPUTED>>>
@@ -331,6 +341,26 @@ const validateForm = () => {
     return true;
 };
 
+// Функция для очистки полей формы
+const resetForm = () => {
+    amountCurrency.value = '';
+    amountCoins.value = '';
+    selectedPaymentMethod.value = null;
+    isValidCurrency.value = true;
+    isValidCoins.value = true;
+    isSubmitted.value = false;
+};
+
+
+// Функция завершения анимации
+const onAnimationFinish = () => {
+    resetForm();  // сбрасываем форму форму
+
+    // После окончания анимации показываем форму снова
+    formVisible.value = true;
+    animationVisible.value = false;
+};
+
 
 const handleSubmit = async () => {
     isActivePayButton.value = true;
@@ -341,7 +371,7 @@ const handleSubmit = async () => {
         isActivePayButton.value = false;
     }, 300);
 
-     // Вызываем функцию валидации
+    // Вызываем функцию валидации
     if (validateForm()) {
         const formData = {
             coinName: selectedCoin.value?.name,
@@ -353,7 +383,16 @@ const handleSubmit = async () => {
             paymentMethod: selectedMethod.value?.name,
         };
 
-        await submitPaymentForm(formData);
+
+
+        const message = 'Заявка отправлена';       // await submitPaymentForm(formData);
+
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        await sleep(700);
+
+        // Скрываем форму и показываем анимацию
+        formVisible.value = false;
+        animationVisible.value = true;
 
     } else {
         console.error("Форма не валидирована");
