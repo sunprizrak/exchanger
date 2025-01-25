@@ -8,7 +8,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@login_required
 class CreateOrder(graphene.Mutation):
     order = graphene.Field(OrderType)
     message = graphene.String()
@@ -22,6 +21,7 @@ class CreateOrder(graphene.Mutation):
         total_price = graphene.Float(required=True)
         payment_method = graphene.String(required=True)
 
+    @login_required
     def mutate(
             root,
             info,
