@@ -8,6 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+@login_required
 class CreateOrder(graphene.Mutation):
     order = graphene.Field(OrderType)
     message = graphene.String()
