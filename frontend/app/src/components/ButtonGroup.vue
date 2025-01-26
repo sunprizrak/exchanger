@@ -3,7 +3,7 @@
         <div
             v-for="(button, index) in buttons"
             :key="index"
-            :class="{ active: button.isActive }"
+            :class="{'active': isActive === index}"
             @click="toggleActive(index)"
         >
             <svg v-if="index === 0" viewBox="0 0 512 512">
@@ -114,40 +114,38 @@
 </template>
 
 
-<script>
-export default {
-    data() {
-        return {
-            buttons: [
-                {
-                    isActive: true,
-                    route: '/',
-                },
-                {
-                    isActive: false,
-                    route: '/orders',
-                },
-                {
-                    isActive: false,
-                    route: '/coins',
-                }
-            ]
-        };
-    },
-    methods: {
-        toggleActive(index) {
-             // Деактивируем все кнопки
-            this.buttons.forEach((button, i) => {
-                button.isActive = i === index;
-            });
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 
-            // Перенаправление на маршрут
-            this.$router.push(this.buttons[index].route);
-        }
-    }
+
+const router = useRouter();
+
+const isActive = ref(0);  // Индекс активной кнопки
+
+
+const buttons = [
+    { url: 'home' },
+    { url: 'orders'},
+    { url: 'coins' },
+]
+
+// Функция для переключения активной кнопки
+const toggleActive = (index) => {
+    isActive.value = index;
+    localStorage.setItem('activeMenuButton', index);
+    router.push({name: buttons[index].url });
 };
-</script>
 
+// Восстановление состояния активной кнопки при монтировании компонента
+onMounted(() => {
+    const activeButton = localStorage.getItem('activeMenuButton');
+    if (activeButton !== null) {
+        isActive.value = Number(activeButton);
+    }
+});
+
+</script>
 
 
 <style scoped>

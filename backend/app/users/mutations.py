@@ -5,7 +5,9 @@ from django.contrib.auth import get_user_model
 from .types import UserType
 from graphql_jwt.shortcuts import get_token
 from .utility import verify_telegram_data
+import logging
 
+logger = logging.getLogger(__name__)
 
 UserModel = get_user_model()
 

@@ -34,17 +34,6 @@ class CreateOrder(graphene.Mutation):
             payment_method
     ):
         user = info.context.user  # Получаем текущего пользователя
-        logger.error("Context Headers:")
-        for key, value in info.context.META.items():
-            if key.startswith('HTTP_'):  # HTTP заголовки
-                logger.error(f"{key}: {value}")
-
-        logger.error(f"User: {user}")
-
-        # Если пользователя нет (не аутентифицирован)
-        if not user or not user.is_authenticated:
-            logger.error("User is not authenticated.")
-            raise Exception("Пользователь не аутентифицирован")
 
         # Создаем новый заказ
         order = Order.objects.create(

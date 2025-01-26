@@ -23,7 +23,7 @@ class Order(models.Model):
     created = models.DateTimeField(verbose_name=_('created'), auto_now_add=True)
 
     def tg_id(self):
-        return self.user.tg_id  # Возвращаем tg_id из пользователя
+        return self.user.tg_id
 
     def tg_username(self):
         return self.user.tg_username

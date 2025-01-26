@@ -1,25 +1,22 @@
-<script setup>
-
-</script>
-
 <template>
     <main>
-        <h1 style="{ color: red; }">Hello Order</h1>
-        <h1>Hello Order</h1>
-        <h1>Hello Order</h1>
-        <h1>Hello Order</h1>
-        <h1>Hello World</h1>
-        <h1>Hello World</h1>
+        <OrderTable />
     </main>
 </template>
 
 
-<script>
-
+<script setup>
+import OrderTable from '@/components/OrderTable/OrderTable.vue';
 </script>
 
-<style>
+<style scoped>
 main {
-    background-color: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: inherit;
+    position: relative;
+
 }
 </style>

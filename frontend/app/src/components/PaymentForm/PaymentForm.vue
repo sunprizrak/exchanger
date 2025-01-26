@@ -123,7 +123,7 @@ import {
     fetchCoinsForAmount,
     fetchAmountForCoins,
     submitPaymentForm,
-} from './utility';
+} from './utils';
 import animHandshake from '@/assets/lottie/handshake.json';
 
 

@@ -1,10 +1,14 @@
 import graphene
 from .models import Order
 from .types import OrderType
+from graphql_jwt.decorators import login_required
 
 
 class Query(graphene.ObjectType):
-    order = graphene.Field(OrderType)
+    # Получение всех ордеров
+    all_orders = graphene.List(OrderType)
 
-    def resolve_order(root, info):
-        return Order.objects.first()
+    @login_required
+    def resolve_all_orders(root, info):
+        user = info.context.user
+        return Order.objects.filter(user=user)

@@ -1,7 +1,3 @@
-<script setup>
-import PaymentForm from '@/components/PaymentForm/PaymentForm.vue';
-</script>
-
 <template>
     <main>
         <PaymentForm />
@@ -9,8 +5,8 @@ import PaymentForm from '@/components/PaymentForm/PaymentForm.vue';
 </template>
 
 
-<script scoped>
-
+<script setup>
+import PaymentForm from '@/components/PaymentForm/PaymentForm.vue';
 </script>
 
 

@@ -7,7 +7,7 @@ import { CREATE_ORDER } from "@/mutations";
 export async function submitPaymentForm(formData) {
     try {
         // Вызов мутации через Apollo
-        const response = await apolloClient.mutate({
+        const { data } = await apolloClient.mutate({
             mutation: CREATE_ORDER,
             variables: {
                 coinName: formData.coinName,
@@ -21,7 +21,7 @@ export async function submitPaymentForm(formData) {
         });
 
         // Извлекаем данные из ответа
-        const message = response.data.createOrder.message;
+        const message = data.createOrder.message;
         return message
     } catch (error) {
         alert("Что-то пошло не так. Мы уже работаем над этим.");
@@ -31,7 +31,7 @@ export async function submitPaymentForm(formData) {
 // Функция для получения количества монет по сумме
 export const fetchCoinsForAmount = async (formData) => {
     try {
-        const response = await apolloClient.query({
+        const { data } = await apolloClient.query({
             query: GET_COINS_FOR_AMOUNT,
             variables: {
                 amount: formData.amount,
@@ -39,7 +39,7 @@ export const fetchCoinsForAmount = async (formData) => {
                 coinTicker: formData.coinTicker,
             },
         });
-        return response.data.coinsAmount; // Результат запроса
+        return data.coinsAmount; // Результат запроса
     } catch (error) {
         alert("Что-то пошло не так. Мы уже работаем над этим.");
     }
@@ -48,7 +48,7 @@ export const fetchCoinsForAmount = async (formData) => {
 // Запрос для получения суммы по количеству монет
 export const fetchAmountForCoins = async (formData) => {
     try {
-        const response = await apolloClient.query({
+        const { data } = await apolloClient.query({
             query: GET_AMOUNT_FOR_COINS,
             variables: {
                 amount: formData.amount,
@@ -56,7 +56,7 @@ export const fetchAmountForCoins = async (formData) => {
                 coinTicker: formData.coinTicker,
             },
         });
-        return response.data.currencyAmount; // Результат запроса
+        return data.currencyAmount; // Результат запроса
     } catch (error) {
         alert("Что-то пошло не так. Мы уже работаем над этим.");
     }

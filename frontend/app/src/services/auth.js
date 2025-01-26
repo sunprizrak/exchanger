@@ -6,7 +6,7 @@ import { useUserStore } from "@/stores/user";
 export async function telegramAuth(initData) {
     try {
         // Вызов мутации через Apollo
-        const response = await apolloClient.mutate({
+        const { data } = await apolloClient.mutate({
             mutation: TG_AUTH,
             variables: {
                 initData: initData,
@@ -14,7 +14,7 @@ export async function telegramAuth(initData) {
         });
 
         // Извлекаем данные из ответа
-        const { token, user } = response.data.telegramAuth;
+        const { token, user } = data.telegramAuth;
 
         const userStore = useUserStore();
         userStore.setToken(token);

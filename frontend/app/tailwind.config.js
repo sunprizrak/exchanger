@@ -4,7 +4,7 @@ export default {
         "./index.css",
         "./src/**/*.{vue,js,ts,jsx,tsx}",
         "./node_modules/flowbite/**/*.js",
-        ],
+    ],
     darkMode: 'class',
     theme: {
         extend: {},

@@ -1,12 +1,5 @@
 import gql from "graphql-tag"
 
-export const USER_INFO = gql`
-    query {
-        user {
-            email
-        }
-    }
-`;
 
 export const GET_ALL_COINS = gql`
     query {
@@ -49,4 +42,21 @@ export const GET_AMOUNT_FOR_COINS = gql`
     query ($amount: Float!, $currencyCode: String!, $coinTicker: String!) {
         currencyAmount(amount: $amount, currencyCode: $currencyCode, coinTicker: $coinTicker)
     },
+`;
+
+export const GET_ALL_ORDERS = gql`
+    query {
+        allOrders {
+            id
+            coinName
+            coinTicker
+            coinAmount
+            currency
+            currencyCode
+            paymentMethod
+            totalPrice
+            status
+            created
+        }
+    }
 `;
