@@ -383,12 +383,10 @@ const handleSubmit = async () => {
             paymentMethod: selectedMethod.value?.name,
         };
 
-
-
-        const message = 'Заявка отправлена';       // await submitPaymentForm(formData);
+        const message = await submitPaymentForm(formData);
 
         const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-        await sleep(700);
+        await sleep(500);
 
         // Скрываем форму и показываем анимацию
         formVisible.value = false;

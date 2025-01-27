@@ -19,7 +19,7 @@ export const useCurrenciesStore = defineStore({
                     // Сохраняем данные в состоянии
                     this.currencies = data.allCurrencies;
                 } catch (error) {
-                    console.error('Error loading currency:', error);
+                    alert('Error loading currency:', error.message);
                 }
             }
         },

@@ -111,6 +111,36 @@ main {
 
     .back {
         transform: rotateY(180deg);
+        display: flex;
+        flex-direction: column;
+        padding: 5px 10px 5px 10px;
+
+        .order-details {
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+
+            span {
+                text-align: center;
+                font-size: 14px;
+                font-weight: bold;
+            }
+
+            p {
+                font-size: 13px;
+                font-weight: bold;
+
+                span {
+                    padding: 2px;
+                    background-color: gray;
+                    border-radius: 5px;
+                }
+
+                strong {
+                    font-size: 14px;
+                }
+            }
+        }
     }
 }
 

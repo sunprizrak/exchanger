@@ -155,7 +155,7 @@ GRAPHQL_JWT = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = ("http://127.0.0.1:5173", "https://ee9f-155-94-216-10.ngrok-free.app")
+CORS_ORIGIN_WHITELIST = ("http://127.0.0.1:5173", "https://9baf-198-44-138-180.ngrok-free.app", "https://8caa96cfb05bb4.lhr.life")
 
 TELEGRAM_BOT_TOKEN = settings.tg.telegram_bot_token
 

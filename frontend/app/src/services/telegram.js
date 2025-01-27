@@ -1,5 +1,10 @@
-export const telegramUtils = {
-    get isTelegramWebApp() {
+import { apolloClient } from "@/apollo-config";
+import { TG_AUTH } from "@/mutations";
+
+
+// Проверяем, является ли приложение WebApp в Telegram
+export const telegram = {
+    get isWebApp() {
         return window.Telegram && window.Telegram.WebApp ? true : false;
     }
 };
@@ -17,18 +22,23 @@ export async function initializeTelegram() {
         }
         return telegramData;
     } catch (error) {
-        console.error("Ошибка в initializeTelegram:", error.message);
         throw error; // Прокидываем ошибку дальше для обработки в вызывающем коде
     }
 }
 
 
-// Отправка данных в Telegram Web App
-export function sendDataToTelegram(data) {
-  if (isTelegramWebApp()) {
-    window.Telegram.WebApp.sendData(data);
-    console.log('Данные отправлены в Telegram Web App:', data);
-  } else {
-    console.log('Telegram Web App не доступен для отправки данных');
-  }
-}
+export async function telegramAuth(initData) {
+    try {
+        // Вызов мутации через Apollo
+        const { data } = await apolloClient.mutate({
+            mutation: TG_AUTH,
+            variables: {
+                initData: initData,
+            },
+        });
+
+        return { token: data.telegramAuth.token, user: data.telegramAuth.user };
+    } catch (error) {
+        alert("Error auth, Что-то пошло не так. Мы уже работаем над этим.", error.message);
+    }
+};

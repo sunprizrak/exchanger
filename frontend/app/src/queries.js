@@ -56,7 +56,7 @@ export const GET_ALL_ORDERS = gql`
             paymentMethod
             totalPrice
             status
-            created
+            createdFormatted
         }
     }
 `;

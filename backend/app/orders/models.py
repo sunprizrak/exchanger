@@ -5,6 +5,14 @@ from django.utils.translation import gettext_lazy as _
 User = get_user_model()
 
 
+def path_check_img(instance, filename):
+    return 'orders/check/{order_id}-{tg_id}-{filename}'.format(
+        order_id=instance.id,
+        tg_id=instance.user.tg_id,
+        filename=filename,
+    )
+
+
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     coin_name = models.CharField(verbose_name='Название', max_length=50)
@@ -20,6 +28,8 @@ class Order(models.Model):
         choices=[('pending', 'Pending'), ('confirmed', 'Confirmed'), ('completed', 'Completed'), ('cancelled', 'Cancelled')],
         default='pending',
     )
+    foto_check = models.ImageField(verbose_name='Чек', upload_to=path_check_img, null=True, blank=True)
+    wallet = models.CharField(verbose_name='Кошелёк', max_length=250, null=True, blank=True)
     created = models.DateTimeField(verbose_name=_('created'), auto_now_add=True)
 
     def tg_id(self):

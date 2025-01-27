@@ -1,15 +1,13 @@
-import { createApp, onMounted } from 'vue';
+import { createApp } from 'vue';
 import App from './App.vue';
 import './index.css';
 import 'flowbite';
 import router from './router';
 import { apolloProvider } from "@/apollo-config";
 import { createPinia } from "pinia";
-import { telegramUtils, initializeTelegram } from '@/services/telegram';
-import { telegramAuth } from '@/services/auth';
-import { useCoinsStore } from "@/stores/coin";
-import { useCurrenciesStore } from "@/stores/currency";
 import Vue3Lottie from 'vue3-lottie';
+import { useCoinsStore } from '@/stores/coin';
+import { useCurrenciesStore } from '@/stores/currency';
 
 
 async function main() {
@@ -18,22 +16,12 @@ async function main() {
         createVueApp();
 
         const coinsStore = useCoinsStore();
-        await coinsStore.loadCoins(); // Загружаем монеты
-
         const currenciesStore = useCurrenciesStore();
-        await currenciesStore.loadCurrencies(); // Загружаем валюты
 
-        // Проверка на запуск внутри Telegram WebApp
-        if (telegramUtils.isTelegramWebApp) {
-            // Инициализация Telegram данных
-            const initData = await initializeTelegram();
-            // Авторизация через Telegram
-            await telegramAuth(initData);
-        } else {
-            console.warn("Приложение не запущено внутри Telegram WebApp.");
-        }
+        await coinsStore.loadCoins(); // Загружаем монеты
+        await currenciesStore.loadCurrencies(); // Загружаем валюты
     } catch (error) {
-        console.error("Ошибка при инициализации приложения:", error);
+        console.error("Ошибка при инициализации приложения:", error.message);
     }
 }
 
