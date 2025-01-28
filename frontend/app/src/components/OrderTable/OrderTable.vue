@@ -57,12 +57,7 @@
                     type="text"
                     placeholder="Ваш кошелек"
                 />
-                <p class="error" v-if="!isValidCoins">
 
-                </p>
-                <p class="error" v-else-if="isSubmitted && amountCoins === ''">
-                    <span>Обязательное поле</span>
-                </p>
             </div>
             <input type="file" />
             <button @click="goBack">Назад</button>
@@ -71,7 +66,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, onUnmounted, watch } from "vue";
 import { useUserStore } from "@/stores/user";
 
 
@@ -89,11 +84,16 @@ onMounted(async () => {
     const userData = localStorage.getItem("user");
     tgUsername.value = userData ? JSON.parse(userData).tgUsername : null;
 
-    if (!userStore.orders.length) {
-        await userStore.loadOrders();
-    }
+    await userStore.loadOrders();
+
+    // Запускаем полинг при монтировании компонента
+    await userStore.startOrderStatusPolling();
 });
 
+onUnmounted(() => {
+    // Останавливаем полинг при размонтировании компонента
+    userStore.stopOrderStatusPolling();
+});
 
 // Функция для обработки клика на строку
 function handleRowClick(order) {

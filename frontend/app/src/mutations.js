@@ -33,19 +33,7 @@ export const CREATE_ORDER = gql`
             totalPrice: $totalPrice,
             paymentMethod: $paymentMethod
         ) {
-            order {
-                id
-                coinName
-                coinTicker
-                coinAmount
-                currency
-                currencyCode
-                paymentMethod
-                totalPrice
-                status
-                createdFormatted
-            }
-
+            order {}
         }
     }
 `;

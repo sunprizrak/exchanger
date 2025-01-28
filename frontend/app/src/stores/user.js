@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
-import { GET_ALL_ORDERS } from "@/queries";
+import { GET_ALL_ORDERS, GET_ORDER_STATUS } from "@/queries";
 import { apolloClient } from "@/apollo-config";
-import { CREATE_ORDER, GET_ORDER_STATUS } from "@/mutations";
+import { CREATE_ORDER } from "@/mutations";
 
 export const useUserStore = defineStore({
     id: "user",
@@ -9,6 +9,7 @@ export const useUserStore = defineStore({
         token: localStorage.getItem("token") || null,
         user: JSON.parse(localStorage.getItem("user")) || null,
         orders: [],
+        orderStatusPollingInterval: null,
     }),
     getters: {
         getToken: (state) => state.token,
@@ -58,9 +59,6 @@ export const useUserStore = defineStore({
                     },
                 });
 
-                // Добавляем новый ордер в ордера
-                const newOrder = data.createOrder.order;
-                this.setOrder(newOrder);
                 return true;
             } catch (error) {
                 alert("Что-то пошло не так. Мы уже работаем над этим.", error.message);
@@ -72,14 +70,10 @@ export const useUserStore = defineStore({
                 // Выполняет GraphQl-запрос
                 const { data } = await apolloClient.query({
                     query: GET_ALL_ORDERS,
+                    fetchPolicy: 'no-cache', // Отключает кеширование
                 });
 
-                data.allOrders.forEach(newOrder => {
-                    const exists = this.orders.some(order => String(order.id) === String(newOrder.id));
-                    if (!exists) {
-                        this.setOrder(newOrder); // Добавляем только новые ордера
-                    }
-                });
+                this.orders = data.allOrders;
             } catch (error) {
                 alert("Error loading orders:", error.message);
             }
@@ -88,7 +82,7 @@ export const useUserStore = defineStore({
         // Добавление нового ордера в хранилище
         setOrder(newOrder) {
             this.orders.unshift(newOrder); // Добавляем новый ордер в начало списка
-        }
+        },
 
         // Функция для обновления статусов ордеров
         async updateOrderStatuses() {
@@ -101,41 +95,50 @@ export const useUserStore = defineStore({
 
                     const { data } = await apolloClient.query({
                         query: GET_ORDER_STATUS,
-                        variables: { orderId: order.id },
+                        variables: {
+                            orderId: order.id
+                        },
+                        fetchPolicy: 'no-cache', // Отключает кеширование
                     });
 
-                    const updatedOrder = data.order;
-                    if (updatedOrder.status !== order.status) {
-                        // Обновляем статус ордера в списке
-                        const orderIndex = this.orders.findIndex(o => o.id === updatedOrder.id);
-                        if (orderIndex !== -1) {
-                            this.orders[orderIndex] = updatedOrder;
-                        }
+                    const updatedStatus = data.orderStatus;
+                    console.log(updatedStatus);
+                    // Если статус ордера изменился, обновляем его в списке
+                    if (updatedStatus !== order.status) {
+                    // Находим ордер в списке и создаем новый объект с обновленным статусом
+                    const orderIndex = this.orders.findIndex(o => o.id === order.id);
+                    if (orderIndex !== -1) {
+                        // Создаем новый объект ордера с обновленным статусом
+                        this.orders[orderIndex] = {
+                            ...this.orders[orderIndex],
+                            status: updatedStatus
+                        };
                     }
+                }
                 }
             } catch (error) {
                 console.error("Error updating order statuses:", error.message);
             }
         },
 
-        // Функция для запуска polling каждые 30 секунд
-        startStatusPolling() {
+        // Функция для запуска polling каждые x секунд
+        startOrderStatusPolling() {
             // Останавливаем предыдущие интервалы, если они были
-            if (this.statusPollingInterval) {
-                clearInterval(this.statusPollingInterval);
+            if (this.orderStatusPollingInterval) {
+                clearInterval(this.orderStatusPollingInterval);
             }
 
-            // Устанавливаем новый интервал для запроса статусов каждые 30 секунд
+            // Устанавливаем новый интервал для запроса статусов каждые x секунд
             this.statusPollingInterval = setInterval(async () => {
                 await this.updateOrderStatuses();
             }, 30000); // 30 секунд
         },
 
         // Функция для остановки polling
-        stopStatusPolling() {
-            if (this.statusPollingInterval) {
-                clearInterval(this.statusPollingInterval);
-                this.statusPollingInterval = null;
+        stopOrderStatusPolling() {
+            if (this.orderStatusPollingInterval) {
+                clearInterval(this.orderStatusPollingInterval);
+                this.orderStatusPollingInterval = null;
             }
         }
     },
