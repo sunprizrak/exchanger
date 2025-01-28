@@ -22,7 +22,7 @@
                     <!-- Динамическое отображение ордеров -->
                     <tr
                         @click="handleRowClick(order)"
-                        v-for="order in orders"
+                        v-for="order in userStore.orders"
                         :key="order.id"
                         tabindex="0"
                     >
@@ -71,13 +71,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { getAllOrders } from "./utils";
+import { ref, onMounted, watch } from "vue";
+import { useUserStore } from "@/stores/user";
 
 
+// <<<STORES>>>
+const userStore = useUserStore();
+
+// <<<STATES>>>
 const tgUsername = ref(null);
-const orders = ref([]);
-const isFlipped = ref(false);   // Состояние для переключения анимации
+const isFlipped = ref(false);        // Состояние для переключения анимации
 const selectedOrder = ref(null);
 
 
@@ -86,7 +89,9 @@ onMounted(async () => {
     const userData = localStorage.getItem("user");
     tgUsername.value = userData ? JSON.parse(userData).tgUsername : null;
 
-    orders.value = await getAllOrders();
+    if (!userStore.orders.length) {
+        await userStore.loadOrders();
+    }
 });
 
 

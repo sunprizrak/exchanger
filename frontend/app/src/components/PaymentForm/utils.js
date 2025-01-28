@@ -1,32 +1,6 @@
 import { apolloClient } from "@/apollo-config";
 import { GET_COINS_FOR_AMOUNT, GET_AMOUNT_FOR_COINS } from "@/queries";
-import { CREATE_ORDER } from "@/mutations";
 
-
-// Функция для создания ордера
-export async function submitPaymentForm(formData) {
-    try {
-        // Вызов мутации через Apollo
-        const { data } = await apolloClient.mutate({
-            mutation: CREATE_ORDER,
-            variables: {
-                coinName: formData.coinName,
-                coinTicker: formData.coinTicker,
-                coinAmount: formData.coinAmount,
-                currency: formData.currency,
-                currencyCode: formData.currencyCode,
-                totalPrice: formData.totalPrice,
-                paymentMethod: formData.paymentMethod,
-            },
-        });
-
-        // Извлекаем данные из ответа
-        const message = data.createOrder.message;
-        return message
-    } catch (error) {
-        alert("Что-то пошло не так. Мы уже работаем над этим.");
-    }
-};
 
 // Функция для получения количества монет по сумме
 export const fetchCoinsForAmount = async (formData) => {

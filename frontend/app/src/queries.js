@@ -60,3 +60,12 @@ export const GET_ALL_ORDERS = gql`
         }
     }
 `;
+
+const GET_ORDER_STATUS = gql`
+    query GetOrderStatus($orderId: ID!) {
+        order(id: $orderId) {
+            id
+            status
+        }
+    }
+`;

@@ -122,12 +122,13 @@ import {
     updateMinMaxAmountCoins,
     fetchCoinsForAmount,
     fetchAmountForCoins,
-    submitPaymentForm,
 } from './utils';
 import animHandshake from '@/assets/lottie/handshake.json';
+import { useUserStore } from "@/stores/user";
 
 
 // <<<STORES>>>
+const userStore = useUserStore();
 const currenciesStore = useCurrenciesStore();
 const currencies = computed(() => currenciesStore.currencies);
 const coinsStore = useCoinsStore();
@@ -147,7 +148,7 @@ const selectedPaymentMethod = ref(null);
 const isSubmitted = ref(false);
 const isActivePayButton = ref(false);
 const formVisible = ref(true);              // Форма видна
-const animationVisible = ref(false);    // Анимация видна
+const animationVisible = ref(false);        // Анимация видна
 
 
 // <<<COMPUTED>>>
@@ -376,21 +377,23 @@ const handleSubmit = async () => {
         const formData = {
             coinName: selectedCoin.value?.name,
             coinTicker: selectedTicker.value,
-            coinAmount: parseFloat(amountCoins.value),
+            coinAmount: parseFloat(amountCoins.value).toFixed(8),
             currency: selectedCurrency.value?.name,
             currencyCode: selectedCode.value,
-            totalPrice: parseFloat(amountCurrency.value),
+            totalPrice: amountCurrency.value.toString(),
             paymentMethod: selectedMethod.value?.name,
         };
 
-        const message = await submitPaymentForm(formData);
+        const order = await userStore.createOrder(formData);
 
-        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-        await sleep(500);
+        if (order) {
+            const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+            await sleep(500);
 
-        // Скрываем форму и показываем анимацию
-        formVisible.value = false;
-        animationVisible.value = true;
+            // Скрываем форму и показываем анимацию
+            formVisible.value = false;
+            animationVisible.value = true;
+        }
 
     } else {
         console.error("Форма не валидирована");

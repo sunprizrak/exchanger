@@ -18,10 +18,10 @@ export const CREATE_ORDER = gql`
     mutation (
         $coinName: String!,
         $coinTicker: String!,
-        $coinAmount: Float!,
+        $coinAmount: String!,
         $currency: String!,
         $currencyCode: String!,
-        $totalPrice: Float!,
+        $totalPrice: String!,
         $paymentMethod: String!
     ) {
         createOrder(
@@ -33,7 +33,19 @@ export const CREATE_ORDER = gql`
             totalPrice: $totalPrice,
             paymentMethod: $paymentMethod
         ) {
-            message
-          }
+            order {
+                id
+                coinName
+                coinTicker
+                coinAmount
+                currency
+                currencyCode
+                paymentMethod
+                totalPrice
+                status
+                createdFormatted
+            }
+
+        }
     }
 `;
