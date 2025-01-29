@@ -40,7 +40,11 @@
             </table>
         </div>
         <div class="back side">
-            <button id='backButton' @click="goBack">Назад</button>
+            <div id='backButton'>
+                <div :class="{'active-click': isActiveBackButton}" @click="handleBackButton">
+                    лол
+                </div>
+            </div>
             <div v-if="selectedOrder" class="order-details">
                 <span>Детали ордера</span>
                 <p v-if="tgUsername"><strong>Пользователь:</strong> {{ tgUsername }}</p>
@@ -99,6 +103,7 @@ const tgUsername = ref(null);
 const isFlipped = ref(false);        // Состояние для переключения анимации
 const selectedOrder = ref(null);
 const isActiveOrderPayButton = ref(false);
+const isActiveBackButton = ref(false);
 
 // Извлекаем данные пользователя из localStorage и получаем ордера
 onMounted(async () => {
@@ -123,10 +128,21 @@ function handleRowClick(order) {
 }
 
 // Обработка кнопки "Назад"
-function goBack() {
+const handleBackButton = async () => {
+    isActiveBackButton.value = true;
+
+
+    // Убираем активный класс через 300ms (время длительности анимации)
+    setTimeout(() => {
+        isActiveBackButton.value = false;
+    }, 300);
+
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    await sleep(500);
+
     isFlipped.value = false;
-    selectedOrder.value = null;            // Сбрасываем выбранный ордер
-}
+    selectedOrder.value = null;           // Сбрасываем выбранный ордер
+};
 
 // Обработка клика кнопки OrderPayButton
 const handleOrderPaySubmit = async () => {

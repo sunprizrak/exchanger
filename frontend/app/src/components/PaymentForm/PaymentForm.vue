@@ -98,7 +98,7 @@
                 </p>
             </div>
         </form>
-        <div class="form-button">
+        <div class="form-button cst-btn">
             <div :class="{'active-click': isActivePayButton}" @click="handleSubmit">КУПИТЬ</div>
         </div>
     </div>
