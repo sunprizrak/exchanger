@@ -33,7 +33,9 @@ export const CREATE_ORDER = gql`
             totalPrice: $totalPrice,
             paymentMethod: $paymentMethod
         ) {
-            order {}
+            order {
+                id
+            }
         }
     }
 `;

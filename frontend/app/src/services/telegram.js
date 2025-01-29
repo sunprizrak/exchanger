@@ -2,13 +2,6 @@ import { apolloClient } from "@/apollo-config";
 import { TG_AUTH } from "@/mutations";
 
 
-// Проверяем, является ли приложение WebApp в Telegram
-export const telegram = {
-    get isWebApp() {
-        return window.Telegram && window.Telegram.WebApp ? true : false;
-    }
-};
-
 // Инициализация Web App
 export async function initializeTelegram() {
     try {
